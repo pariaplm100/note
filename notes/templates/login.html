@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head >
+    
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in/Sign up</title>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="title">User Account</div>
+
+    <div class="toggle">
+        <button id="loginBtn" class="active" onclick="showLogin()">Login</button>
+        <button id="registerBtn" onclick="showRegister()">Sign up</button>
+    </div>
+
+    <!-- LOGIN -->
+    <form method="POST" action="{% url 'login_user' %}" id="loginForm" class="form active">
+        {% csrf_token %}
+
+
+        <input type="text" name="username" placeholder="Username">
+        <input type="password" name="password" placeholder="Password">
+
+        <div class="captcha">
+            <div class="captcha-box">11745</div>
+            <input type="text" name="captcha" placeholder="Captcha">
+        </div>
+
+        <button class="btn" type="submit">Login to account</button>
+    </form>
+
+    <!-- REGISTER -->
+    <form method="POST" action="{% url 'register_user' %}" id="registerForm" class="form">
+        {% csrf_token %}
+        
+
+        <input type="text" name="username" placeholder="Username">
+        <input type="text" name="phone" placeholder="Phone Number">
+        <input type="email" name="email" placeholder="Email">
+        <input type="password" name="password1" placeholder="Password">
+        <input type="password" name="password2" placeholder="Confirm Password">
+
+        <div class="captcha">
+            <div class="captcha-box">46719</div>
+            <input type="text" name="captcha" placeholder="Captcha">
+        </div>
+        <a href="home.html">
+            <button class="btn" type="submit">Sign Up</button>
+        </a>
+    </form>
+
+</div>
+
+<script>
+function showLogin(){
+    document.getElementById("loginForm").classList.add("active");
+    document.getElementById("registerForm").classList.remove("active");
+
+    document.getElementById("loginBtn").classList.add("active");
+    document.getElementById("registerBtn").classList.remove("active");
+}
+
+function showRegister(){
+    document.getElementById("registerForm").classList.add("active");
+    document.getElementById("loginForm").classList.remove("active");
+
+    document.getElementById("registerBtn").classList.add("active");
+    document.getElementById("loginBtn").classList.remove("active");
+}
+</script>
+
+</body>
+</html>
