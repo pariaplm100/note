@@ -5,8 +5,9 @@ from .models import notes
 
 class NoteAdmin(admin.ModelAdmin): 
     date_hierarchy = "create_time"
-    list_display = ('id','name','status','create_time','update_time')
-    search_fields = ['status','name']
+    list_display = ('id','author__username','name','status','create_time','update_time')
+    search_fields = ['status','name','author__username']
+    list_filter = ('status','author__username')
     ordering = ['create_time']
     
 admin.site.register(notes,NoteAdmin) 
