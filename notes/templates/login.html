@@ -13,13 +13,14 @@
 <div class="container">
 
     <div class="title">User Account</div>
-    {% if messages %}
+   <!-- {% if messages %}
       {% for message in messages %}
         <div class="message error">
              {{ message.tags }} - {{ message }}
         </div>
       {% endfor %}
-    {% endif %}
+    {% endif %}-->
+
     <div class="toggle">
         <button id="loginBtn" class="active" onclick="showLogin()">Login</button>
         <button id="registerBtn" onclick="showRegister()">Sign up</button>
@@ -29,13 +30,23 @@
         {% csrf_token %}
 
 
-        <input type="text" name="username" placeholder="Username">
-        <input type="password" name="password" placeholder="Password">
+        <input type="text" name="username" placeholder="Username" value="{{username}}" class="{% if username_error %}input-error{% endif %}">
+        {% if username_error %}
+        <div class="error-box">{{ username_error }}</div>
+        {% endif %}
+
+        <input type="password" name="password" placeholder="Password"  class="{% if password_error %}input-error{% endif %}">
+        {% if password_error %}
+        <div class="error-box">{{ password_error }}</div>
+        {% endif %}
 
         <div class="captcha">
             <div class="captcha-box">{{captcha1}}</div>
-            <input type="text" name="captcha" placeholder="Captcha">
+            <input type="text" name="captcha" placeholder="Captcha"  class="{% if captcha_error %}input-error{% endif %}">
         </div>
+        {% if captcha_error %}
+            <div class="error-box">{{ captcha_error }}</div>   
+        {% endif %}
 
         <button class="btn" type="submit">Login to account</button>
     </form>
