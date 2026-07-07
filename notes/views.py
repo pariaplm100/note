@@ -73,7 +73,7 @@ def login_user(request):
     
 
 def home(request):
-    return render(request, 'accounts/index.html')
+    return render(request, 'templates/home.html')
 
 def login_view(request):
     return render(request, 'accounts/login.html')
