@@ -5,7 +5,9 @@ from django.contrib import messages
 from .captcha import Captcha
 from .models import notes
 
-
+def AboutUs(request):
+    return render(request,"AboutUs.html")
+    
 def login_page(request):
     login_captcha = str(Captcha())
     register_captcha = str(Captcha())
