@@ -13,6 +13,11 @@
     </style>
 </head>
 <body>
-    <h1>About Us</h1>
+    <form class="" action="{% url 'notes:AboutUs %}" method="post">
+        <div class="about">
+            {% csrf_token %}
+            <div class="">
+                <input name="name" placeholder="Enter your name" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Enter your name'" class="" required="" type="text">
+            
 </body>
 </html>

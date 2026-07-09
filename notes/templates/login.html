@@ -33,7 +33,8 @@
 
         <div class="captcha">
             <div class="captcha-box">{{captcha1}}</div>
-            <input type="text" name="captcha" placeholder="Captcha"  class="{% if captcha_error %}input-error{% endif %}">
+            <input type="text" name="captcha" placeholder="Captcha">
+
         </div>
         {% if captcha_error %}
             <div class="error-box">{{ captcha_error }}</div>   
