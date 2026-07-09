@@ -5,19 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us</title>
-    <style>
-        h1{
-            text-align: center;
-            background-color: rgb(159, 160, 144);
-        }
-    </style>
 </head>
 <body>
-    <form class="" action="{% url 'notes:AboutUs %}" method="post">
-        <div class="about">
-            {% csrf_token %}
-            <div class="">
-                <input name="name" placeholder="Enter your name" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Enter your name'" class="" required="" type="text">
-            
+
+<form action="{% url 'notes:AboutUs' %}" method="post">
+    {% csrf_token %}
+
+    <div class="about">
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </div>
+
+</form>
+
 </body>
 </html>

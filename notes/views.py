@@ -3,8 +3,8 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from .captcha import Captcha
 from notes.forms import AboutusForm
+from notes.captcha import Captcha
 
 def AboutUs_view(request):
     if request.method == "POST":
@@ -67,9 +67,6 @@ def login_user(request):
             username=username,
             password=password
         )
-        print(username)
-        print(password)
-        print(user)
         
         if user is not None:
             login(request, user)
