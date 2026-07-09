@@ -53,6 +53,15 @@ body{
     border-bottom: 3px solid #0d6efd;
 }
 
+.back-page{
+    display: block;
+    width: 100%;
+    margin-top: 0; 
+    padding: 10px 20px; 
+    box-sizing: border-box;
+    text-align: left;
+}
+
 
 /* عنوان */
 
