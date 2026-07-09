@@ -39,7 +39,21 @@
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody"></tbody>
+                <tbody id="tableBody">
+                    {% for note in notes %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ note.name }}</td>
+                        <td>{{ note.topic }}</td>
+                        <td>{{ note.create_time }}</td>
+                        <td>
+                            <button>View</button>
+                            <button>Edit</button>
+                            <button>Delete</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
             </table>
         </section>
     </div>

@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from .captcha import Captcha
+from .models import notes
 
 
 def login_page(request):
@@ -73,7 +74,12 @@ def login_user(request):
     
 
 def home(request):
-    return render(request, 'home.html')
+    note_all = notes.objects.all()
+    context = {
+        "notes" : note_all
+    }
+    return render(request, 'home.html', context)
+
 
 def login_view(request):
     return render(request, 'accounts/login.html')
