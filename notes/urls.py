@@ -17,4 +17,7 @@ urlpatterns = [
     path("register/", views.register_user, name="register_user"),
 
     path("AboutUs/", views.AboutUs_view, name="AboutUs"),
+
+    path('contact-us/', views.ContactUs_view, name='ContactUs'),
+
 ]
