@@ -3,9 +3,23 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from notes.forms import AboutusForm
+from notes.forms import AboutusForm,ContactUsForm
 from notes.captcha import Captcha
 
+def ContactUs_view(request):
+    form = ContactUsForm()
+
+    if request.method == "POST":
+        form = ContactUsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("notes:ContactUs")
+    else:
+        form = AboutusForm()
+        
+    return render(request, "contact-us.html", {"form": form})
+    
+    
 def AboutUs_view(request):
     if request.method == "POST":
         form = AboutusForm(request.POST)

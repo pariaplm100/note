@@ -5,6 +5,7 @@ from notes import views
 app_name = "notes"
 
 urlpatterns = [
+    
     path('admin/', admin.site.urls),
     
     path("", views.home, name="home"),
