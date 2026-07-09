@@ -8,12 +8,12 @@ from notes.forms import AboutusForm
 
 def AboutUs_view(request):
     if request.method == "POST":
-        form = AboutUsForm(request.POST)
+        form = AboutusForm(request.POST)
         if form.is_valid():
             form.save()
             return render(request, "AboutUs.html", {"form": form})
     else:
-        form = AboutUsForm()
+        form = AboutusForm()
 
     return render(request, "AboutUs.html", {"form": form})
     
