@@ -200,17 +200,26 @@ textarea{
 
 .back-btn{
     position: fixed;
-    top: 13px;
+    top: 8px;
     left: 8px;
+
     width: 35px;
-    height: 20px;
+    height: 35px;
+
     display: flex;
     justify-content: center;
     align-items: center;
+
+    background: #90c8f36b;
     color: black;
+
     text-decoration: none;
     font-size: 28.5px;
     font-weight: bold;
+
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.50);
+
     transition: all .25s ease;
     z-index: 1000;
 }
@@ -221,10 +230,28 @@ textarea{
 }
 
 .back-btn:hover{
+    background: #0a58ca;
     transform: translateY(-2px);
     box-shadow: 0 50px 50px rgba(0,0,0,.35);
 }
 
-.back-btn:active{
-    transform: scale(.95);
+    
+.auto-fill{
+    background-color: #90c8f36b;
+    transition: background-color 0.3s ease;
 }
+
+.auto-fill:focus{
+    background-color: #90c8f320;
+}    
+
+.auto-fill{
+    background-color: #90c8f36b;
+    transition: background-color 0.3s ease;
+}
+
+.auto-fill:focus{
+    background-color: #90c8f320;
+}    
+
+    
