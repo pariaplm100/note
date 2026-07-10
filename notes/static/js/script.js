@@ -1,3 +1,9 @@
+const modal = document.getElementById("noteModal");
+const modalLesson = document.getElementById("modalLesson");
+const modalNote = document.getElementById("modalNote");
+
+const closeModal = document.getElementById("closeModal");
+const closeButton = document.getElementById("closeButton");
 const newBtn = document.getElementById("newBtn");
 const tableBody = document.getElementById("tableBody");
 
@@ -58,7 +64,17 @@ newBtn.addEventListener("click", function () {
         });
 
         viewBtn.addEventListener("click", function () {
-            alert(noteText);
+            modalLesson.textContent = lessonName;
+            modalNote.textContent = noteText;
+            modal.style.display = "flex";
+        });
+
+        closeModal.addEventListener("click", function(){
+        modal.style.display = "none";
+        });
+
+        closeButton.addEventListener("click", function(){
+        modal.style.display = "none";
         });
 
         editBtn.addEventListener("click", function () {
@@ -86,6 +102,8 @@ newBtn.addEventListener("click", function () {
         counter++;
     });
 });
+
+
 
 function reorderNumbers() {
     const rows = tableBody.querySelectorAll("tr");

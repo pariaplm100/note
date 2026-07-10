@@ -5,8 +5,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from notes.forms import AboutusForm,ContactUsForm
 from notes.captcha import Captcha
-from .models import notes
-from .forms import NoteForm
+from .models import Note
 
 def ContactUs_view(request):
     form = ContactUsForm()
@@ -101,27 +100,7 @@ def login_user(request):
     
 
 def home(request):
-    if request.method == "POST":
-        form = NoteForm(request.POST)
-
-        if form.is_valid():
-            note = form.save(commit=False)
-
-            if request.user.is_authenticated:
-                note.author = request.user
-
-            note.save()
-            return redirect("notes:home")
-
-    else:
-        form = NoteForm()
-
-    all_notes = notes.objects.all()
-
-    return render(request, "home.html", {
-        "notes": all_notes,
-        "form": form,
-    })
+    return render(request, "home.html")
 
 def login_view(request):
     return render(request, 'accounts/login.html')
