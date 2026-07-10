@@ -38,7 +38,7 @@
 
             <div class="right">
                 <input type="text" placeholder="Search"/>
-                <button class="new" id="newBtn">New</button>
+                <button type="button" class="new" id="newBtn">+ New</button>
             </div>
         </section>
         <!--Table-->
@@ -54,22 +54,29 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    {% for note in notes %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ note.name }}</td>
-                        <td>{{ note.topic }}</td>
-                        <td>{{ note.create_time }}</td>
-                        <td>
-                            <button>View</button>
-                            <button>Edit</button>
-                            <button>Delete</button>
-                        </td>
-                    </tr>
-                    {% endfor %}
                 </tbody>
             </table>
         </section>
+    </div>
+<script src="{% static 'js/script.js' %}"></script>
+<!--پنجره برای دیدن و انتخاب فایل و جزوات درسی-->
+    <div id="noteModal" class="modal">
+        <div class="modal-content">
+
+            <span id="closeModal" class="close-btn">&times;</span>
+
+            <h2 id="modalLesson"></h2>
+
+            <p id="modalNote"></p>
+
+            <div class="file-section">
+                <label>Select File:</label>
+                <input type="file" id="fileInput">
+            </div>
+
+            <button id="closeButton">Close</button>
+
+        </div>
     </div>
 </body>
 </html>
