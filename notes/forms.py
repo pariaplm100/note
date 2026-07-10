@@ -1,5 +1,6 @@
 from django import forms 
 from notes.models import AboutUs,ContactUs
+from .models import notes
 
 
 class Aboutus(forms.Form):
@@ -15,5 +16,10 @@ class AboutusForm(forms.ModelForm):
 class ContactUsForm(forms.ModelForm):
     class Meta:
         model = ContactUs
-        fields = "__all__"        
+        fields = "__all__"  
+
+class NoteForm(forms.ModelForm):
+    class Meta:
+        model = notes
+        fields = ['name', 'topic']      
     
