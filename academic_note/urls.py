@@ -9,11 +9,7 @@ urlpatterns = [
     
     path("", views.home, name="home"),
     
-    
     path('', include("notes.urls")),
 
-    path("AboutUs/", views.AboutUs_view, name="AboutUs"),
-    
-    path("ContactUs/", views.ContactUs_view, name="ContactUs"),
 
 ]

@@ -113,3 +113,7 @@ def login_page(request):
         "username": request.user.username
     }
     return render(request, "login.html", context )
+    
+    
+def password_reset_view(request):
+    return render(request,'profile.html')

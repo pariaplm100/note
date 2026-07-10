@@ -3,15 +3,11 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-<<<<<<< HEAD
 from notes.forms import AboutusForm,ContactUsForm
-from notes.captcha import Captcha
 from .models import Note
-=======
 from notes.forms import AboutusForm, ContactUsForm
 from django.contrib.auth.decorators import login_required
 from .models import Note 
->>>>>>> 1bdded7 (Handle Some Errors in Show pannel and Solving them.                #problems:1)incorrect urls 2)missing Setting Function 3)No views Method for show ContactUs and Profile Pannel.)
 
 def ContactUs_view(request):
     if request.method == "POST":
@@ -36,7 +32,6 @@ def AboutUs_view(request):
     
 @login_required    
 def home(request):
-<<<<<<< HEAD
     return render(request, "home.html")
 
 def login_view(request):
@@ -84,11 +79,9 @@ def register_user(request):
             return redirect("login_page")
 
     return redirect("login_page")
-=======
     notes = Note.objects.filter(author=request.user)
     return render(request, 'home.html', {'notes': notes})
     
 def profile_view(request):
     return render(request,'profile.html')
     
->>>>>>> 1bdded7 (Handle Some Errors in Show pannel and Solving them.                #problems:1)incorrect urls 2)missing Setting Function 3)No views Method for show ContactUs and Profile Pannel.)

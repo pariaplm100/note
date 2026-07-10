@@ -17,10 +17,12 @@
         <header class="page-header">
             <nav class="navbar">
                 
-                <a href="" class="item-navbar">Profile</a>
-                <a href="" class="item-navbar">View All</a>
-                <a href="{% url 'notes:login_page' %}" class="item-navbar">sing up | Login</a>
-
+                {% if not request.user.is_authenticated %}
+                <a href="{% url 'accounts:login_page' %}" class="item-navbar">sing up | Login</a>
+                {% else %}
+                <p></p>
+                {% endif %}
+                
                 {% if request.user.is_authenticated %}
                 <a href="{% url 'notes:profile' %}" class="item-navbar">
                     <span>profil</span><br>
@@ -31,16 +33,9 @@
                 {% endif %}    
                 
                 <a href="" class="item-navbar">setting</a>
-                
-                {% if not request.user.is_authenticated %}
-                <a href="{% url 'accounts:login_page' %}" class="item-navbar">sing up | Login</a>
-                {% else %}
-                <p></p>
-                {% endif %}
                  
                 <a href="{% url 'notes:AboutUs' %}" class="item-navbar">About us</a>
                 <a href="{% url 'notes:ContactUs' %}" class="item-navbar">Contact Us</a>
-                <a href="{% url 'notes:' %}" class="back-page">🔙back</a>
             </nav>
         </header>
     <div class="liner-continer">
@@ -65,8 +60,8 @@
         {% csrf_token %}
         <div class="contact-us">
             <div class="f-l name">
-                <label for="form-full-name">Full Name :</label>
-                <input  type="text" name="full_name" id="form-full-name" placeholder="name">
+                <label for="form-full-name">Username:</label>
+                <input  type="text" name="full_name" id="form-full-name" placeholder="Username">
             </div>
             <div class="email">
                 <label for="form-email">Email :</label>
@@ -78,7 +73,7 @@
             </div>
             <div class="message-text">
                 <label for="form-field-message">Message :</label>
-                <textarea name="message" id="form-field-message" placeholder="say somthing..." rows="4"></textarea>
+                <textarea name="message" id="form-field-message" placeholder="Say Somethings...." rows="4"></textarea>
             </div>
             <div class="send-text">
     			<button class="send-text" type="submit">
