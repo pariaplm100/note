@@ -45,6 +45,3 @@ class ContactUs(models.Model):
     def __str__(self):
         return self.full_name    
         
-class notes(models.Model):
-    name = models.CharField(...)
-    topic = models.TextField(...)
