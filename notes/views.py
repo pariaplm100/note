@@ -1,25 +1,28 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect 
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+<<<<<<< HEAD
 from notes.forms import AboutusForm,ContactUsForm
 from notes.captcha import Captcha
 from .models import Note
+=======
+from notes.forms import AboutusForm, ContactUsForm
+from django.contrib.auth.decorators import login_required
+from .models import Note 
+>>>>>>> 1bdded7 (Handle Some Errors in Show pannel and Solving them.                #problems:1)incorrect urls 2)missing Setting Function 3)No views Method for show ContactUs and Profile Pannel.)
 
 def ContactUs_view(request):
-    form = ContactUsForm()
-
     if request.method == "POST":
         form = ContactUsForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect("notes:ContactUs")
     else:
-        form = AboutusForm()
+        form = ContactUsForm()
         
     return render(request, "contact-us.html", {"form": form})
-    
     
 def AboutUs_view(request):
     if request.method == "POST":
@@ -29,77 +32,11 @@ def AboutUs_view(request):
             return render(request, "AboutUs.html", {"form": form})
     else:
         form = AboutusForm()
-
     return render(request, "AboutUs.html", {"form": form})
     
-def login_page(request):
-    login_captcha = str(Captcha())
-    register_captcha = str(Captcha())
-
-    request.session["login_captcha"] = login_captcha
-    request.session["register_captcha"] = register_captcha
-    
-    context = {
-        "captcha1" : login_captcha,
-        "captcha2" : register_captcha,
-        "username_error" : "",
-        "password_error" : "",
-        "captcha_error" : "",
-        "username": ""
-    }
-
-    return render(request, "login.html", context )
-    
-
-def login_user(request):
-    if request.method == "POST":
-
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        user_captcha = request.POST.get("captcha")
-
-
-        real_captcha = request.session.get("login_captcha")
-
-        new_captcha = str(Captcha())
-        request.session["login_captcha"] = new_captcha
-
-        context = {
-        "captcha1" : new_captcha,
-        "username": username,
-        "username_error" : "",
-        "password_error" : "",
-        "captcha_error" : "",
-    }
-
-
-        if user_captcha != real_captcha:
-            context["captcha_error"] = "Captcha is incorrect."
-            return render(request,"login.html",context)
-
-        user = authenticate(
-            request,
-            username=username,
-            password=password
-        )
-        
-        if user is not None:
-            login(request, user)
-
-            request.session.pop("login_captcha", None)
-
-            return redirect("home")
-
-        else:
-            if not User.objects.filter(username=username).exists():
-                context["username_error"] = "Username does not exist."
-            else:
-                context["password_error"] = "Password is incorrect.."
-            return render(request,"login.html",context)
-    return redirect("login_page")
-    
-
+@login_required    
 def home(request):
+<<<<<<< HEAD
     return render(request, "home.html")
 
 def login_view(request):
@@ -147,3 +84,11 @@ def register_user(request):
             return redirect("login_page")
 
     return redirect("login_page")
+=======
+    notes = Note.objects.filter(author=request.user)
+    return render(request, 'home.html', {'notes': notes})
+    
+def profile_view(request):
+    return render(request,'profile.html')
+    
+>>>>>>> 1bdded7 (Handle Some Errors in Show pannel and Solving them.                #problems:1)incorrect urls 2)missing Setting Function 3)No views Method for show ContactUs and Profile Pannel.)

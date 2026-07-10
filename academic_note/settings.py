@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'notes',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -32,6 +33,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'academic_note.urls'
+LOGIN_URL = 'accounts:login_page'
+
 
 TEMPLATES = [
     {
