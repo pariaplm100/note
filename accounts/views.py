@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from .models import Profile
 
 def login_view(request):
     if request.method == "POST":
@@ -11,6 +12,7 @@ def login_view(request):
         username = request.POST.get("username")
         password = request.POST.get("password")
         user_captcha = request.POST.get("captcha")
+        phone_number = request.POST.get("phone_number")
 
 
         real_captcha = request.session.get("login_captcha")
@@ -72,6 +74,7 @@ def signup_view(request):
         email = request.POST.get("email")
         password1 = request.POST.get("password1")
         password2 = request.POST.get("password2")
+        phone_number = request.POST.get("phone_number")
 
         if User.objects.filter(username=username).exists():
             request.session.pop("register_captcha", None)
@@ -79,12 +82,16 @@ def signup_view(request):
             return redirect("accounts:login_page")
 
         if password1 == password2:
-            User.objects.create_user(
+            user=User.objects.create_user(
                 username=username,
                 email=email,
                 password=password1
             )
-
+            Profile.objects.create(
+            user=user,
+            phone_number=phone_number
+            )
+ 
             request.session.pop("register_captcha", None)
             messages.success(request, "ثبت‌نام موفق بود")
             return redirect("accounts:login_page")

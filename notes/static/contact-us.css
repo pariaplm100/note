@@ -235,6 +235,13 @@ textarea{
     box-shadow: 0 50px 50px rgba(0,0,0,.35);
 }
 
-.back-btn:active{
-    transform: scale(.95);
+    
+.auto-fill{
+    background-color: #90c8f36b;
+    transition: background-color 0.3s ease;
 }
+
+.auto-fill:focus{
+    background-color: #90c8f320;
+}    
+    

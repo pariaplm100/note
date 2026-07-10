@@ -59,9 +59,10 @@
     <form action="{% url 'notes:ContactUs' %}" method="post">
         {% csrf_token %}
         <div class="contact-us">
+            {% if not request.user.is_authenticated %}
             <div class="f-l name">
-                <label for="form-full-name">Username:</label>
-                <input  type="text" name="full_name" id="form-full-name" placeholder="Username">
+                <label for="form-Username">Username:</label>
+                <input  type="text" name="username" id="form-Username" placeholder="Username">
             </div>
             <div class="email">
                 <label for="form-email">Email :</label>
@@ -70,6 +71,20 @@
             <div class="phone_number">
                 <label for="form-number">Phone Number :</label>
                 <input type="tel" name="telephonenumber" id="form-number" placeholder="phone number">
+            {% else %}    
+            <div class="f-2">
+                <label for="form-Username">Username:</label>
+                <input  class='auto-fill' type="text" value="{{request.user.username}}" name="username" id="form-Username" placeholder="Username">
+            </div>
+            <div class="email-2">
+                <label for="form-email">Email :</label>
+                <input class='auto-fill' type="email" value="{{request.user.email}}" name="email" id="form-email" placeholder="example@gmail.com">
+            </div>
+            <div class="phone_number">
+                <label for="form-number">Phone Number :</label>
+                <input class='auto-fill' type="tel" value="{{request.user.profile.phone_number}}" name="telephonenumber" id="form-number" placeholder="phone number">
+            
+            {% endif %}    
             </div>
             <div class="message-text">
                 <label for="form-field-message">Message :</label>
@@ -82,5 +97,12 @@
 		</div>
 	</form>	
     </div>
+    <script>
+        document.querySelectorAll(".auto-fill").forEach(input => {
+        input.addEventListener("input", function() {
+            this.style.backgroundColor = "white";
+        });
+    });
+    </script>
 </body>
 </html>
