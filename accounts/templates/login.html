@@ -17,7 +17,7 @@
         <button id="registerBtn" onclick="showRegister()">Sign up</button>
     </div>
 
-    <form method="POST" action="{% url 'login_user' %}" id="loginForm" class="form active">
+    <form method="POST" action="{% url 'accounts:login' %}" id="loginForm" class="form active">
         {% csrf_token %}
 
 
@@ -43,7 +43,7 @@
         <button class="btn" type="submit">Login to account</button>
     </form>
 
-    <form method="POST" action="{% url 'register_user' %}" id="registerForm" class="form">
+    <form method="POST" action="{% url 'accounts:signup' %}" id="registerForm" class="form">
         {% csrf_token %}
         
 
