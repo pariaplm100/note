@@ -8,15 +8,5 @@
 </head>
 <body>
 
-<form action="{% url 'notes:AboutUs' %}" method="post">
-    {% csrf_token %}
-
-    <div class="about">
-        {{ form.as_p }}
-        <button type="submit">Submit</button>
-    </div>
-
-</form>
-
 </body>
 </html>

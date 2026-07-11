@@ -5,6 +5,8 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Profile
+from django.http import HttpResponse
+from django.urls import reverse
 
 def login_view(request):
     if request.method == "POST":
@@ -12,7 +14,7 @@ def login_view(request):
         username = request.POST.get("username")
         password = request.POST.get("password")
         user_captcha = request.POST.get("captcha")
-        phone_number = request.POST.get("phone_number")
+        phone_number= request.POST.get("phone_number")
 
 
         real_captcha = request.session.get("login_captcha")
@@ -54,10 +56,11 @@ def login_view(request):
             return render(request,"login.html",context)
     return redirect("accounts:login_page")
     
-@login_required    
+
 def logout_view(request):
-    logout(request)
-    return redirect('/')
+    if request.user.is_authenticated:
+        logout(request)
+    return redirect(reverse('notes:home'))
 
 
 def signup_view(request):
@@ -120,7 +123,7 @@ def login_page(request):
         "username": request.user.username
     }
     return render(request, "login.html", context )
-    
+
     
 def password_reset_view(request):
     return render(request,'profile.html')
