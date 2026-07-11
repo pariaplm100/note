@@ -106,6 +106,10 @@ body{
     font-weight:600;
 }
 
+.icon-box-email .icon-box-email-p{
+    position:relative;
+    left:-25px;
+}    
 /* باکس ها */
 
 .icon-box-email,
@@ -116,17 +120,49 @@ body{
     margin-bottom:70px;
 }
 
+.icon-box-email .icon-box-email-p2{
+    position: relative;
+    top:8px;
+    left:-3px;
+}    
+
 .icon-box-email h3,
 .icon-box-hour h3{
     margin-bottom:15px;
 }
 
-.icon-box-email a,
-.icon-box-hour a{
+.icon-box-email .email-address{
+    text-decoration:none;
+    color:#555;
+    font-weight:bold;
+    position: relative;
+    top:10px;
+}
+
+.icon-box-email .a2{
     text-decoration:none;
     color:#b22222;
     font-size:30px;
     font-weight:bold;
+    position:relative;
+    left:-10px;
+    top:13px;
+}
+
+    
+    
+.icon-box-hour a{
+    display: flex;
+    margin-bottom: 50px;
+    margin-left:40px;
+    text-decoration:none;
+    color:#b22222;
+    font-size:30px;
+    font-weight:bold;
+    position:relative;
+    left:80px;
+    top:5px;
+    
 }
 
 .icon-box-email p,
@@ -135,6 +171,20 @@ body{
     font-size:17px;
 }
 
+.icon-box-hour p{
+    display:flex;
+    align-content:center;
+    justify-content:center;
+    position: relative;
+    top: -30px;    
+    left:60px;
+}    
+
+.icon-box-email .icon-box-email-p{
+    position:relative;
+    left:-3px;
+    top:5px;
+}    
 /* فرم */
 
 .contact-us{
@@ -254,4 +304,7 @@ textarea{
     background-color: #90c8f320;
 }    
 
+    
+
+    
     
