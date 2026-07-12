@@ -3,10 +3,13 @@ from accounts.captcha import Captcha
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from .models import Profile
-from django.http import HttpResponse
 from django.urls import reverse
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.core.validators import validate_email
+import re
 
 def login_view(request):
     if request.method == "POST":
@@ -78,33 +81,80 @@ def signup_view(request):
         password1 = request.POST.get("password1")
         password2 = request.POST.get("password2")
         phone_number = request.POST.get("phone_number")
-
-        if User.objects.filter(username=username).exists():
+        
+        if password1 != password2:
+            messages.error(request, "Passwords don't match.")
             request.session.pop("register_captcha", None)
-            messages.error(request, "این نام کاربری قبلاً ثبت شده")
             return redirect("accounts:login_page")
 
-        if password1 == password2:
-            user=User.objects.create_user(
+        try:
+            validate_password(password1)
+        except ValidationError as e:
+            errors = " ".join(e.messages)
+            if "too short" in errors:
+                messages.error(request, "Password is too short.")
+            elif "too common" in errors:
+                messages.error(request, "Password is too common.")
+            elif "entirely numeric" in errors:
+                messages.error(request, "Password cannot be only numbers.")
+            else:
+                messages.error(request, "Invalid password.")
+
+            request.session.pop("register_captcha", None)
+            return redirect("accounts:login_page")
+        
+        if not re.fullmatch(r"09\d{9}", phone_number):
+            messages.error(request,"Invalid phone number.")
+            request.session.pop("register_captcha", None)
+            return redirect("accounts:login_page")
+        
+        if email:
+            try:
+                validate_email(email)
+            except ValidationError:
+                messages.error(request, "Invalid email address.")
+                request.session.pop("register_captcha", None)
+                return redirect("accounts:login_page")
+        
+        validator = UnicodeUsernameValidator()
+        try:
+            validator(username)
+        except ValidationError:
+            messages.error(request, "Invalid username.")
+            request.session.pop("register_captcha", None)
+            return redirect("accounts:login_page")
+        
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists.")
+            request.session.pop("register_captcha", None)
+            return redirect("accounts:login_page")
+        
+        if email and User.objects.filter(email=email).exists():
+            messages.error(request, "Email is already registered.")
+            request.session.pop("register_captcha", None)
+            return redirect("accounts:login_page")
+            
+        if Profile.objects.filter(phone_number=phone_number).exists():
+            messages.error(request, "Phone number is already registered.")
+            request.session.pop("register_captcha", None)
+            return redirect("accounts:login_page")    
+        
+        user=User.objects.create_user(
                 username=username,
                 email=email,
                 password=password1
             )
-            Profile.objects.create(
+        Profile.objects.create(
             user=user,
             phone_number=phone_number
-            )
- 
-            request.session.pop("register_captcha", None)
-            messages.success(request, "ثبت‌نام موفق بود")
-            return redirect("accounts:login_page")
+        )        
+    
+        request.session.pop("register_captcha", None)
+        messages.success(request, "Sign up successful.")
+        return redirect("accounts:login_page")
 
-        else:
-            request.session.pop("register_captcha", None)
-            messages.error(request, "رمزها یکسان نیستند")
-            return redirect("accounts:login_page")
-
-    return render(request,'accounts/signup.html')
+    request.session.pop("register_captcha", None)
+    return redirect('accounts:login_page')
 
 
 def login_page(request):

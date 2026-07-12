@@ -1,24 +1,20 @@
-{% load static %}
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
-    <link rel="stylesheet" href="{% static 'profile.css' %}">
 </head>
 <body>
-    <div class="contaner">
-        <div class="profile">
-            <div class="image"><img src="https://rasanika.com/storage/i/17263/11XRGPqMYoSnic0zJ1uVJcl2/orig-900/image--rasanika.com.webp" alt="profile"></div>
-                <a href=""><button class="btn" >Courses and Notes</button></a>
-                <a href=""><button class="btn" >Edit Profile | complete</button></a>
-                <a href=""><button class="btn" >View Profile</button></a>
-                <a href="{% url 'accounts:logout' %}" class="logout"><button class="btn1">LOG OUT</button></a>
-                
+    <div>
+        <div><h3>My Profile</h3></div>
+        <div>
+            <a href="{% url 'notes:profile' %}">Sign up | Login</a>
+            <a href="{% url 'accounts:password_reset' %}">Forgot Password</a>
+            <a href="{% url 'notes:home' %}">LOG OUT</a>
         </div>
     </div>
+    
 </body>
 </html>
-
-<!--<a href="{% url 'accounts:password_reset' %}">Forgot Password</a>-->
