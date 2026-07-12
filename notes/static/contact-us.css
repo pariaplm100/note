@@ -19,13 +19,15 @@ body{
 }
 
 .page-header{
+    position: sticky;
     width: 100%;
     height: 90px;
-    background: #90c8f36b;
+    background: #aedaf9;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 60px;
+    top: 0;
 }
 
 .navbar{

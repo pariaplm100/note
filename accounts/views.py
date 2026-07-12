@@ -74,7 +74,7 @@ def signup_view(request):
         if user_captcha != real_captcha:
             request.session.pop("register_captcha", None)
             messages.error(request, "Captcha is incorrect.")
-            return redirect("accounts:login_page")
+            return redirect("accounts:signup")
 
         username = request.POST.get("username")
         email = request.POST.get("email")
@@ -85,7 +85,7 @@ def signup_view(request):
         if password1 != password2:
             messages.error(request, "Passwords don't match.")
             request.session.pop("register_captcha", None)
-            return redirect("accounts:login_page")
+            return redirect("accounts:signup")
 
         try:
             validate_password(password1)
@@ -101,12 +101,12 @@ def signup_view(request):
                 messages.error(request, "Invalid password.")
 
             request.session.pop("register_captcha", None)
-            return redirect("accounts:login_page")
+            return redirect("accounts:signup")
         
         if not re.fullmatch(r"09\d{9}", phone_number):
             messages.error(request,"Invalid phone number.")
             request.session.pop("register_captcha", None)
-            return redirect("accounts:login_page")
+            return redirect("accounts:signup")
         
         if email:
             try:
@@ -114,7 +114,7 @@ def signup_view(request):
             except ValidationError:
                 messages.error(request, "Invalid email address.")
                 request.session.pop("register_captcha", None)
-                return redirect("accounts:login_page")
+                return redirect("accounts:signup")
         
         validator = UnicodeUsernameValidator()
         try:
@@ -122,22 +122,22 @@ def signup_view(request):
         except ValidationError:
             messages.error(request, "Invalid username.")
             request.session.pop("register_captcha", None)
-            return redirect("accounts:login_page")
+            return redirect("accounts:signup")
         
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username already exists.")
             request.session.pop("register_captcha", None)
-            return redirect("accounts:login_page")
+            return redirect("accounts:signup")
         
         if email and User.objects.filter(email=email).exists():
             messages.error(request, "Email is already registered.")
             request.session.pop("register_captcha", None)
-            return redirect("accounts:login_page")
+            return redirect("accounts:signup")
             
         if Profile.objects.filter(phone_number=phone_number).exists():
             messages.error(request, "Phone number is already registered.")
             request.session.pop("register_captcha", None)
-            return redirect("accounts:login_page")    
+            return redirect("accounts:signup")    
         
         user=User.objects.create_user(
                 username=username,
@@ -152,9 +152,12 @@ def signup_view(request):
         request.session.pop("register_captcha", None)
         messages.success(request, "Sign up successful.")
         return redirect("accounts:login_page")
+    register_captcha = str(Captcha())
+    request.session["register_captcha"] = register_captcha
 
-    request.session.pop("register_captcha", None)
-    return redirect('accounts:login_page')
+    context = {"captcha2": register_captcha,}
+
+    return render(request, "login.html", context)
 
 
 def login_page(request):

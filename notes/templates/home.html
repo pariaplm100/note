@@ -1,41 +1,6 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class Note</title>
-    <link rel="stylesheet" href="{% static 'home.css' %}">
-</head>
-<body>
-    <div class="container">
-        <!--Header-->
-        <header class="page-header">
-            <nav class="navbar">
-                {% if request.user.is_authenticated %}
-                <a href="{% url 'notes:profile' %}" class="profile-link">
-                    <img src="https://rasanika.com/storage/i/17263/11XRGPqMYoSnic0zJ1uVJcl2/orig-900/image--rasanika.com.webp"
-                        alt="profile"
-                        class="profile_icon">
-
-                    <span class="username">
-                        {{ request.user.username }}
-                    </span>
-                </a>                
-                {% endif %}
-                
-                <a href="" class="item-navbar active">setting</a>
-                {% if not request.user.is_authenticated %}
-                <a href="{% url 'accounts:login_page' %}"  class="item-navbar active">Sign up | Login</a>
-                {% else %}
-                <p></p>
-                {% endif %}
-
-                <a href="{% url 'notes:AboutUs' %}" class="item-navbar active">About us</a>
-                <a href="{% url 'notes:ContactUs' %}" class="item-navbar active">Contact Us</a>
-            </nav>
-            <h1 class="Noteorganizer">Note Organizer</h1>
-        </header>
+{% block content %}
         <!--toolbar-->
         <section class="toolbar">
 
@@ -44,5 +9,4 @@
                 <button type="button" class="new" id="newBtn">+ New</button>
             </div>
         </section>
-</body>
-</html>
+{% endblock %}
