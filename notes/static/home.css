@@ -96,3 +96,138 @@ button{
     background-color: #126383;
     cursor: pointer;
 }
+
+.notes-container{
+    width:100%;
+    margin-top:40px;
+}
+
+.note-card{
+    width:100%;
+    min-height:120px;
+    border:5px solid black;
+    padding:20px;
+    margin-bottom:25px;
+    border-radius:10px;
+    background:white;
+}
+
+.card-header{
+    border-bottom:4px solid black;
+    padding-bottom:10px;
+    margin-bottom:15px;
+}
+
+.card-header h2{
+    font-size:28px;
+}
+
+.card-body p{
+    font-size:20px;
+}
+
+.note-form{
+    display:none;
+    width:400px;
+    padding:20px;
+    margin:20px auto;
+    border:2px solid #ccc;
+    border-radius:10px;
+
+    flex-direction:column;
+    gap:15px;
+}
+
+.note-form input,
+.note-form textarea{
+    width:100%;
+    padding:10px;
+    font-size:16px;
+}
+
+.note-form textarea{
+    height:120px;
+    resize:none;
+}
+
+.note-form button{
+    padding:10px 20px;
+    border:none;
+    background:#4daeea;
+    color:white;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.message{
+    padding:10px;
+    margin:10px 0;
+    border-radius:6px;
+    text-align:center;
+    font-size:14px;
+}
+
+.message.error{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position: relative;
+    top:-300px;
+    background:#ffdddd;
+    color:#b30000;
+    border:1px solid #ff6666;
+    
+}
+
+.message.success{
+    background:#ddffdd;
+    color:#006600;
+    border:1px solid #66cc66;
+}
+
+#toast-container{
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    pointer-events: none;
+}
+
+.toast{
+    min-width: 260px;
+    max-width: 350px;
+
+    padding: 14px 18px;
+    border-radius: 10px;
+
+    color: white;
+    font-size: 15px;
+
+    box-shadow: 0 8px 20px rgba(0,0,0,.25);
+
+    opacity: 1;
+    transition: opacity .5s ease, transform .5s ease;
+
+    transform: translateX(0);
+}
+
+.toast.success{
+    background: #2ecc71;
+}
+
+.toast.error{
+    background: #e74c3c;
+}
+
+.toast.warning{
+    background: #f39c12;
+}
+
+.toast.info{
+    background: #3498db;
+}

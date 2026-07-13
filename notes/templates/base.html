@@ -5,14 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us</title>
-    <link rel="stylesheet" href="{% static 'contact-us.css' %}">
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
     
-    <a href="javascript:history.back()" class="back-btn">
-        <span>←</span>
-    </a>
-    
+    {% if messages %}
+    <div id="toast-container">
+        {% for message in messages %}
+            <div class="toast {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>    
+    {% endif %}
     <div class="container">
         <header class="page-header">
             <nav class="navbar">
@@ -24,15 +30,13 @@
                 {% endif %}
                 
                 {% if request.user.is_authenticated %}
-                <a href="{% url 'notes:profile' %}" class="item-navbar">
-                    <span>profil</span><br>
-                    <span class="username">
-                    {{request.user.username}}
-                </span>
-                </a>
+                <a href="{% url 'notes:profile' %}" class="profile-link">
+                    <img src="https://rasanika.com/storage/i/17263/11XRGPqMYoSnic0zJ1uVJcl2/orig-900/image--rasanika.com.webp"
+                        alt="profile"
+                        class="profile_icon">
                 {% endif %}    
                 
-                <a href="" class="item-navbar">setting</a>
+                <a href="{% url 'notes:home' %}" class="item-navbar">Home</a>
                  
                 <a href="{% url 'notes:AboutUs' %}" class="item-navbar">About us</a>
                 <a href="{% url 'notes:ContactUs' %}" class="item-navbar">Contact Us</a>
@@ -43,5 +47,15 @@
 
         {% endblock  %}
     </div>
+    <script>
+        setTimeout(() => {
+            document.querySelectorAll(".toast").forEach(msg => {
+                msg.style.opacity = "0";
+                msg.style.transform = "translateX(100px)";
+                setTimeout(() => {msg.remove();}, 300);
+            });
+        }, 2500);
+    </script>    
+    
 </body>
 </html>

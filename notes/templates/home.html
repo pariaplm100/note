@@ -1,12 +1,83 @@
 {% extends "base.html" %}
 {% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'home.css' %}">
+{% endblock %}
 {% block content %}
         <!--toolbar-->
         <section class="toolbar">
-
             <div class="right">
                 <input type="text" placeholder="Search"/>
                 <button type="button" class="new" id="newBtn">+ New</button>
             </div>
         </section>
+        <div id="noteForm" class="note-form">
+            <input type="text" id="courseName" placeholder="Course Name">
+            <textarea id="courseNote" placeholder="Write your note..."></textarea>                <button id="saveBtn">Save</button>
+        </div>
+        <div class="notes-container">
+            {% for note in notes %}
+                <div class="note-card">
+                    <div class="card-header">
+                        <h2>{{ note.name }}</h2>
+                    </div>
+
+                    <div class="card-body">
+                        <p>{{ note.topic }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+        <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
+<script>
+const newBtn = document.getElementById("newBtn");
+const noteForm = document.getElementById("noteForm");
+const saveBtn = document.getElementById("saveBtn");
+
+newBtn.addEventListener("click", function () {
+    noteForm.style.display = "flex";
+});
+
+saveBtn.addEventListener("click", function () {
+
+    const name = document.getElementById("courseName").value;
+    const topic = document.getElementById("courseNote").value;
+
+    fetch("{% url 'notes:create_note' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": document.getElementById("csrfToken").value
+        },
+        body: JSON.stringify({
+            name: name,
+            topic: topic
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        const notesContainer = document.querySelector(".notes-container");
+
+        notesContainer.innerHTML += `
+            <div class="note-card">
+                <div class="card-header">
+                    <h2>${data.name}</h2>
+                </div>
+
+                <div class="card-body">
+                    <p>${data.topic}</p>
+                </div>
+            </div>
+        `;
+
+        document.getElementById("courseName").value = "";
+        document.getElementById("courseNote").value = "";
+
+        noteForm.style.display = "none";
+    });
+});
+</script>
+
 {% endblock %}
