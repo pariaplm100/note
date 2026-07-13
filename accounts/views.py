@@ -31,6 +31,7 @@ def login_view(request):
         "username_error" : "",
         "password_error" : "",
         "captcha_error" : "",
+        "show_login": request.session.pop("show_login", False),
     }
         
             
@@ -60,7 +61,7 @@ def login_view(request):
         
         if user is not None:
             login(request, user)
-
+            messages.success(request, "Login successful.")
             request.session.pop("login_captcha", None)
 
             return redirect("notes:home")
@@ -178,6 +179,7 @@ def signup_view(request):
     
         request.session.pop("register_captcha", None)
         messages.success(request, "Sign up successful.")
+        request.session["show_login"] = True
         return redirect("accounts:login_page")
 
     request.session.pop("register_captcha", None)
@@ -197,7 +199,8 @@ def login_page(request):
         "username_error" : "",
         "password_error" : "",
         "captcha_error" : "",
-        "username": request.user.username
+        "username": request.user.username,
+        "show_login": request.session.pop("show_login", False),
     }
     return render(request, "login.html", context )
 

@@ -56,8 +56,21 @@ body{
     border-bottom: 3px solid #0d6efd;
 }
 
+.profile_icon {
+  width: 40px;      
+  height: 40px;
+  border-radius: 50%;  
+  object-fit: cover;
+  display: inline-block;
+  vertical-align: middle;
+}
 
-/* عنوان */
+.profile_icon:hover{
+    background-color: #2eaadc;
+    transform: translateY(0.2rem);
+
+}
+
 
 .liner-continer{
     width:90%;
@@ -71,7 +84,6 @@ body{
     font-weight:bold;
 }
 
-/* متن توضیح */
 
 .title-continer{
     width:70%;
@@ -85,7 +97,6 @@ body{
     font-size:17px;
 }
 
-/* خط وسط */
 
 .elementor-text-contact-information{
     display:flex;
@@ -108,7 +119,6 @@ body{
     font-size:20px;
     font-weight:600;
 }
-/* باکس ها */
 
 .icon-box-email,
 .icon-box-hour{
@@ -120,6 +130,8 @@ body{
 
 .icon-box-email .icon-box-email-p2{
     position: relative;
+    display:inline-block;
+    color:#666;
     top:-2px;
     left:-3px;
 }    
@@ -148,8 +160,6 @@ body{
     color:#666;
     font-size:17px;
 }
-
-/* فرم */
 
 .contact-us{
     width:60%;
@@ -267,3 +277,76 @@ textarea{
 .auto-fill:focus{
     background-color: #90c8f320;
 }    
+
+.message{
+    padding:10px;
+    margin:10px 0;
+    border-radius:6px;
+    text-align:center;
+    font-size:14px;
+}
+
+.message.error{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position: relative;
+    top:-300px;
+    background:#ffdddd;
+    color:#b30000;
+    border:1px solid #ff6666;
+    
+}
+
+.message.success{
+    background:#ddffdd;
+    color:#006600;
+    border:1px solid #66cc66;
+}
+
+#toast-container{
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    pointer-events: none;
+}
+
+.toast{
+    min-width: 260px;
+    max-width: 350px;
+
+    padding: 14px 18px;
+    border-radius: 10px;
+
+    color: white;
+    font-size: 15px;
+
+    box-shadow: 0 8px 20px rgba(0,0,0,.25);
+
+    opacity: 1;
+    transition: opacity .5s ease, transform .5s ease;
+
+    transform: translateX(0);
+}
+
+.toast.success{
+    background: #2ecc71;
+}
+
+.toast.error{
+    background: #e74c3c;
+}
+
+.toast.warning{
+    background: #f39c12;
+}
+
+.toast.info{
+    background: #3498db;
+}

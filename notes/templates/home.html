@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'home.css' %}">
+{% endblock %}
 {% block content %}
         <!--toolbar-->
         <section class="toolbar">
-
             <div class="right">
                 <input type="text" placeholder="Search"/>
                 <button type="button" class="new" id="newBtn">+ New</button>
