@@ -1,8 +1,8 @@
 body{
     margin:0;
     font-family:sans-serif;
-    background:linear-gradient(9deg,#999a9a,#5d85a7e3);
-    color:white;
+    background:linear-gradient(135deg,#8db8e8,#d7ecff);
+    color:rgb(0, 0, 0);
     display:flex;
     justify-content:center;
     align-items:center;
@@ -11,7 +11,7 @@ body{
 
 .container{
     width:400px;
-    background:#12141472;
+    background:#ffffff;
     border-radius:20px;
     padding:30px;
     box-sizing:border-box;
@@ -31,14 +31,14 @@ body{
 
 .verify-text{
     text-align:center;
-    color:#f5f5f5;
+    color:#000000b0;
     font-size:15px;
     line-height:1.7;
     margin-bottom:25px;
 }
 
 .verify-text span{
-    color:#9fdcff;
+    color:#27284b;
     font-weight:bold;
     word-break:break-word;
 }
@@ -49,8 +49,8 @@ body{
     margin-bottom:20px;
     border-radius:10px;
     border:1px solid #333;
-    background:#0f0f0f;
-    color:white;
+    background:#ffffff;
+    color:rgb(0, 0, 0);
     outline:none;
     text-align:center;
     font-size:17px;
@@ -68,17 +68,18 @@ body{
     padding:12px;
     border:none;
     border-radius:10px;
-    background:white;
+    background:#4b90e2;
     color:black;
     font-weight:bold;
     cursor:pointer;
     transition:.3s;
-    box-shadow: 0 8px 5px rgba(0,0,0,0.5);
+    box-shadow: 0 5px 5px rgba(0,0,0,0.5);
 }
 
 .btn:hover{
+    background-color: #3579cc;
     transform:translateY(-2px);
-    box-shadow:0 5px 15px rgba(0,0,0,.25);
+    box-shadow:0 2px 15px rgba(0,0,0,.25);
 }
 
 .resend-btn{
@@ -87,16 +88,16 @@ body{
     margin-top:15px;
     border:none;
     border-radius:10px;
-    background-color:black;
-    color:gray;
+    background-color:rgb(255, 255, 255);
+    color:rgba(0, 0, 0, 0.616);
     font-weight:bold;
     cursor:pointer;
     transition:.3s;
-    box-shadow: 0 8px 5px rgba(0,0,0,0.5);
+    box-shadow: 0 5px 5px rgba(0,0,0,0.5);
 }
 
 .resend-btn:hover{
-    background:#222;
+    background:#3579cc28;
     transform:translateY(-2px);
     box-shadow:0 5px 15px rgba(0,0,0,.25);
 }
@@ -173,7 +174,7 @@ body{
 }
 
 .back-btn:hover{
-    background: black;
+    background: rgba(0, 0, 0, 0.164);
     color:white;
     transform: translateY(-2px);
     box-shadow: 0 50px 50px rgba(0,0,0,.35);

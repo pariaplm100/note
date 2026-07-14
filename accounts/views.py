@@ -16,6 +16,26 @@ from random import randint
 from time import time
 
 
+def signup_context(request, username="", email="", phone_number=""):
+    login_captcha = str(Captcha())
+    register_captcha = str(Captcha())
+    request.session["login_captcha"] = login_captcha
+    request.session["register_captcha"] = register_captcha
+
+    return {
+        "captcha1": login_captcha,
+        "captcha2": register_captcha,
+        "show_login": False,
+        "signup_username": username,
+        "signup_email": email,
+        "signup_phone": phone_number,
+        "username": "",
+        "username_error": "",
+        "password_error": "",
+        "captcha_error": "",
+    }
+
+
 def can_resend(request):
     last_resend = request.session.get("last_resend")
     if last_resend and time() - last_resend < 60:
@@ -115,59 +135,77 @@ def signup_view(request):
 
         user_captcha = request.POST.get("captcha")
         real_captcha = request.session.get("register_captcha")
-
-        if user_captcha != real_captcha:
-            request.session.pop("register_captcha", None)
-            messages.error(request, "Captcha is incorrect.")
-            return redirect("accounts:login_page")
-
+        phone_number = request.POST.get("phone_number")
+        
         username = request.POST.get("username")
         email = request.POST.get("email")
         password1 = request.POST.get("password1")
         password2 = request.POST.get("password2")
         phone_number = request.POST.get("phone_number")
+        
+        context = signup_context(
+            request,
+            username=username,
+            email=email,
+            phone_number=phone_number
+        )
+        
+        if user_captcha != real_captcha:
+            new_captcha = str(Captcha())
+            request.session["register_captcha"] = new_captcha
+            context["captcha2"] = new_captcha
+            messages.error(request, "Captcha is incorrect.")
+            return render(request, "login.html", context)
 
         if password1 != password2:
             messages.error(request, "Passwords don't match.")
-            return redirect("accounts:login_page")
+            return render(request, "login.html", context)
 
         if len(username) < 4:
+            context["signup_username"] = ""
             messages.error(request, "Username must be at least 4 characters.")
-            return redirect("accounts:login_page")
+            return render(request, "login.html", context)
 
         if len(username) > 20:
+            context["signup_username"] = ""
             messages.error(request, "Username cannot be longer than 20 characters.")
-            return redirect("accounts:login_page")
+            return render(request, "login.html", context)
 
         validator = UnicodeUsernameValidator()
         try:
             validator(username)
         except ValidationError:
+            context["signup_username"] = ""
             messages.error(request, "Invalid username.")
-            return redirect("accounts:login_page")
+            return render(request, "login.html", context)
 
         if email:
             try:
                 validate_email(email)
             except ValidationError:
+                context["signup_email"] = ""
                 messages.error(request, "Invalid email address.")
-                return redirect("accounts:login_page")
+                return render(request, "login.html", context)
 
         if not re.fullmatch(r"09\d{9}", phone_number):
+            context["signup_phone"] = ""
             messages.error(request, "Invalid phone number.")
-            return redirect("accounts:login_page")
+            return render(request, "login.html", context)
 
         if User.objects.filter(username=username).exists():
+            context["signup_username"] = ""
             messages.error(request, "Username already exists.")
-            return redirect("accounts:login_page")
+            return render(request, "login.html", context)
 
         if email and User.objects.filter(email=email).exists():
+            context["signup_email"] = ""
             messages.error(request, "Email is already registered.")
-            return redirect("accounts:login_page")
+            return render(request, "login.html", context)
 
         if Profile.objects.filter(phone_number=phone_number).exists():
+            context["signup_phone"] = ""
             messages.error(request, "Phone number is already registered.")
-            return redirect("accounts:login_page")
+            return render(request, "login.html", context)
 
         try:
             validate_password(password1)
@@ -183,7 +221,7 @@ def signup_view(request):
             else:
                 messages.error(request, "Invalid password.")
 
-            return redirect("accounts:login_page")
+            return render(request, "login.html", context)
         
         request.session["signup_data"] = {
             "username": username,
@@ -222,7 +260,7 @@ def login_page(request):
     return render(request, "login.html", context )
 
     
-    
+@never_cache    
 def verify_email_view(request):
 
     if request.method == "POST":
@@ -311,7 +349,7 @@ def verify_email_view(request):
     return render(request,"verify_email.html",{"email": request.session.get("signup_data", {}).get("email"),"last_resend": request.session.get("last_resend", 0)
     })
     
-    
+@never_cache    
 def forgot_password_view(request):
 
     if request.method == "POST":
@@ -332,6 +370,7 @@ def forgot_password_view(request):
 
     return render(request, "forgot_password.html")
     
+@never_cache    
 def verify_reset_password_view(request):
 
     if request.method == "POST":
@@ -398,7 +437,7 @@ def verify_reset_password_view(request):
         "last_resend": request.session.get("last_resend", 0),
     })
     
- 
+@never_cache 
 def new_password_view(request):
 
     if not request.session.get("reset_verified"):
