@@ -3,13 +3,39 @@ from accounts.captcha import Captcha
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
+from django.core.mail import send_mail
 from .models import Profile
 from django.urls import reverse
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.validators import validate_email
+from django.views.decorators.cache import never_cache
 import re
+from random import randint
+from time import time
+
+
+def can_resend(request):
+    last_resend = request.session.get("last_resend")
+    if last_resend and time() - last_resend < 60:
+        return False
+    return True
+
+def send_otp(request, email):
+    otp = str(randint(100000, 999999))
+
+    request.session["otp"] = otp
+    request.session["otp_time"] = int(time())
+    request.session["last_resend"] = int(time())
+
+    send_mail(
+        subject="Verification Code",
+        message=f"Your verification code is: {otp}",
+        from_email=None,
+        recipient_list=[email],
+        fail_silently=False,
+    )
 
 def login_view(request):
     if request.method == "POST":
@@ -81,10 +107,12 @@ def logout_view(request):
     if request.user.is_authenticated:
         logout(request)
     return redirect(reverse('notes:home'))
-
+    
+    
 
 def signup_view(request):
     if request.method == "POST":
+
         user_captcha = request.POST.get("captcha")
         real_captcha = request.session.get("register_captcha")
 
@@ -98,62 +126,54 @@ def signup_view(request):
         password1 = request.POST.get("password1")
         password2 = request.POST.get("password2")
         phone_number = request.POST.get("phone_number")
-        
+
         if password1 != password2:
             messages.error(request, "Passwords don't match.")
-            request.session.pop("register_captcha", None)
             return redirect("accounts:login_page")
-            
+
         if len(username) < 4:
             messages.error(request, "Username must be at least 4 characters.")
-            request.session.pop("register_captcha", None)
             return redirect("accounts:login_page")
 
         if len(username) > 20:
             messages.error(request, "Username cannot be longer than 20 characters.")
-            request.session.pop("register_captcha", None)
-            return redirect("accounts:login_page")    
-            
+            return redirect("accounts:login_page")
+
         validator = UnicodeUsernameValidator()
         try:
             validator(username)
         except ValidationError:
             messages.error(request, "Invalid username.")
-            request.session.pop("register_captcha", None)
-            return redirect("accounts:login_page")   
-            
+            return redirect("accounts:login_page")
+
         if email:
             try:
                 validate_email(email)
             except ValidationError:
                 messages.error(request, "Invalid email address.")
-                request.session.pop("register_captcha", None)
-                return redirect("accounts:login_page")    
-                
+                return redirect("accounts:login_page")
+
         if not re.fullmatch(r"09\d{9}", phone_number):
-            messages.error(request,"Invalid phone number.")
-            request.session.pop("register_captcha", None)
-            return redirect("accounts:login_page")      
-            
+            messages.error(request, "Invalid phone number.")
+            return redirect("accounts:login_page")
+
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username already exists.")
-            request.session.pop("register_captcha", None)
-            return redirect("accounts:login_page")   
-            
+            return redirect("accounts:login_page")
+
         if email and User.objects.filter(email=email).exists():
             messages.error(request, "Email is already registered.")
-            request.session.pop("register_captcha", None)
-            return redirect("accounts:login_page") 
-            
+            return redirect("accounts:login_page")
+
         if Profile.objects.filter(phone_number=phone_number).exists():
             messages.error(request, "Phone number is already registered.")
-            request.session.pop("register_captcha", None)
-            return redirect("accounts:login_page")    
+            return redirect("accounts:login_page")
 
         try:
             validate_password(password1)
         except ValidationError as e:
             errors = " ".join(e.messages)
+
             if "too short" in errors:
                 messages.error(request, "Password is too short.")
             elif "too common" in errors:
@@ -163,29 +183,26 @@ def signup_view(request):
             else:
                 messages.error(request, "Invalid password.")
 
-            request.session.pop("register_captcha", None)
             return redirect("accounts:login_page")
-            
         
-        user=User.objects.create_user(
-                username=username,
-                email=email,
-                password=password1
-            )
-        Profile.objects.create(
-            user=user,
-            phone_number=phone_number
-        )        
-    
+        request.session["signup_data"] = {
+            "username": username,
+            "email": email,
+            "password": password1,
+            "phone_number": phone_number,
+        }
+        
+        send_otp(request,email) 
+        
         request.session.pop("register_captcha", None)
-        messages.success(request, "Sign up successful.")
-        request.session["show_login"] = True
-        return redirect("accounts:login_page")
+
+        return redirect("accounts:verify_email")
 
     request.session.pop("register_captcha", None)
-    return redirect('accounts:login_page')
+    return redirect("accounts:login_page")
 
 
+@never_cache
 def login_page(request):
     login_captcha = str(Captcha())
     register_captcha = str(Captcha())
@@ -205,5 +222,215 @@ def login_page(request):
     return render(request, "login.html", context )
 
     
-def password_reset_view(request):
-    return render(request,'profile.html')
+    
+def verify_email_view(request):
+
+    if request.method == "POST":
+        
+        if request.POST.get("resend"):
+
+            data = request.session.get("signup_data")
+
+            if data is None:
+                messages.error(request, "Session expired.")
+                return redirect("accounts:login_page")
+
+            if not can_resend(request):
+                messages.error(request, "Please wait 60 seconds before requesting another code.")
+                
+                request.session.pop("register_captcha", None)
+                return redirect("accounts:verify_email")
+
+            send_otp(request, data["email"])
+
+            messages.success(request, "A new verification code has been sent.")
+            
+            request.session.pop("register_captcha", None)
+            return redirect("accounts:verify_email")
+
+        user_otp = request.POST.get("otp")
+        real_otp = request.session.get("otp")
+        otp_time = request.session.get("otp_time")
+        
+        if otp_time is None:
+            messages.error(request, "Verification code has expired.")
+            
+            request.session.pop('otp',None)
+            request.session.pop('otp_time',None)
+            request.session.pop('signup_data',None)
+            request.session.pop("register_captcha", None)
+            
+            return redirect("accounts:login_page")
+        
+        expire_time = 120
+        if time() - otp_time > expire_time:
+            messages.error(request, "Verification code has expired.")
+            
+            request.session.pop("otp",None)
+            request.session.pop("otp_time",None)
+            request.session.pop("signup_data", None)
+            request.session.pop("register_captcha", None)
+            
+            return redirect("accounts:verify_email")
+
+        if user_otp == real_otp:
+
+            data = request.session.get("signup_data")
+            
+            if data is None:
+                messages.error(request,"Session expired.")
+                request.session.pop("register_captcha", None)
+                
+                return redirect("accounts:login_page")
+                
+            user = User.objects.create_user(
+                username=data["username"],
+                email=data["email"],
+                password=data["password"],
+            )
+
+            Profile.objects.create(
+                user=user,
+                phone_number=data["phone_number"],
+            )
+
+            request.session.pop("otp", None)
+            request.session.pop("otp_time", None)
+            request.session.pop("signup_data", None)
+            request.session.pop("register_captcha", None)
+
+            messages.success(request, "Account created successfully.")
+            request.session["show_login"] = True
+
+            return redirect("accounts:login_page")
+
+        else:
+            messages.error(request, "Verification code is incorrect.")
+            request.session.pop("register_captcha", None)
+
+    return render(request,"verify_email.html",{"email": request.session.get("signup_data", {}).get("email"),"last_resend": request.session.get("last_resend", 0)
+    })
+    
+    
+def forgot_password_view(request):
+
+    if request.method == "POST":
+        username = request.POST.get("username")
+
+        if not User.objects.filter(username=username).exists():
+            messages.error(request, "Username does not exist.")
+            return redirect("accounts:forgot_password")
+
+        user = User.objects.get(username=username)
+
+        request.session["reset_username"] = username
+
+        send_otp(request, user.email)
+
+        messages.success(request, "Verification code sent to your email.")
+        return redirect("accounts:verify_reset_password")
+
+    return render(request, "forgot_password.html")
+    
+def verify_reset_password_view(request):
+
+    if request.method == "POST":
+
+        if request.POST.get("resend"):
+
+            username = request.session.get("reset_username")
+
+            if username is None:
+                messages.error(request, "Session expired.")
+                return redirect("accounts:forgot_password")
+
+            user = User.objects.get(username=username)
+
+            if not can_resend(request):
+                messages.error(request, "Please wait 60 seconds before requesting another code.")
+                return redirect("accounts:verify_reset_password")
+
+            send_otp(request, user.email)
+
+            messages.success(request, "A new verification code has been sent.")
+
+            return redirect("accounts:verify_reset_password")
+
+
+        user_otp = request.POST.get("otp")
+        real_otp = request.session.get("otp")
+        otp_time = request.session.get("otp_time")
+
+        if otp_time is None:
+            messages.error(request, "Verification code has expired.")
+            return redirect("accounts:forgot_password")
+
+        if time() - otp_time > 120:
+
+            request.session.pop("otp", None)
+            request.session.pop("otp_time", None)
+
+            messages.error(request, "Verification code has expired.")
+
+            return redirect("accounts:verify_reset_password")
+
+        if user_otp == real_otp:
+
+            request.session["reset_verified"] = True
+
+            request.session.pop("otp", None)
+            request.session.pop("otp_time", None)
+
+            return redirect("accounts:new_password")
+
+        messages.error(request, "Verification code is incorrect.")
+
+    username = request.session.get("reset_username")
+
+    email = ""
+
+    if username:
+        email = User.objects.get(username=username).email
+
+    return render(request, "verify_reset_password.html", {
+        "email": email,
+        "last_resend": request.session.get("last_resend", 0),
+        "last_resend": request.session.get("last_resend", 0),
+    })
+    
+ 
+def new_password_view(request):
+
+    if not request.session.get("reset_verified"):
+        return redirect("accounts:forgot_password")
+
+    if request.method == "POST":
+        password1 = request.POST.get("password1")
+        password2 = request.POST.get("password2")
+
+        if password1 != password2:
+            messages.error(request, "Passwords don't match.")
+            return redirect("accounts:new_password")
+
+        try:
+            validate_password(password1)
+        except ValidationError as e:
+            messages.error(request, " ".join(e.messages))
+            return redirect("accounts:new_password")
+
+        username = request.session.get("reset_username")
+
+        user = User.objects.get(username=username)
+
+        user.set_password(password1)
+        user.save()
+
+        request.session.pop("reset_username", None)
+        request.session.pop("reset_verified", None)
+
+        messages.success(request, "Password changed successfully.")
+
+        request.session["show_login"] = True
+        return redirect("accounts:login_page")
+
+    return render(request, "reset_password.html")

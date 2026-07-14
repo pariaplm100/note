@@ -4,11 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from notes.forms import AboutusForm,ContactUsForm
-from .models import Note
-from notes.forms import AboutusForm, ContactUsForm
-from django.contrib.auth.decorators import login_required
-from .models import Note 
-import json
+from .models import Note, NoteFile
 
 def ContactUs_view(request):
     if request.method == "POST":
@@ -44,6 +40,36 @@ def home_view(request):
 
 def create_note(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-        note = Note.objects.create(author=request.user,name=data["name"],topic=data["topic"])
-        return JsonResponse({"id": note.id,"name": note.name,"topic": note.topic})
+
+        name = request.POST.get("name")
+        topic = request.POST.get("topic")
+        uploaded_files = request.FILES.getlist("files")
+
+        note = Note.objects.create(
+            author=request.user,
+            name=name,
+            topic=topic
+        )
+
+        for file in uploaded_files:
+            NoteFile.objects.create(
+                note=note,
+                file=file
+            )
+
+        files_data = []
+
+        for f in note.files.all():
+            files_data.append({
+                "name": f.file.name.split("/")[-1],
+                "url": f.file.url
+            })
+
+        return JsonResponse({
+            "id": note.id,
+            "name": note.name,
+            "topic": note.topic,
+            "files": files_data
+            })
+
+    return JsonResponse({"error": "Invalid request"},status=400)

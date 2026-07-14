@@ -5,6 +5,7 @@ class Note(models.Model):
     author = models.ForeignKey(User,on_delete = models.SET_NULL,null=True)
     name = models.CharField(max_length=100)
     topic = models.TextField(max_length=200)
+#    file = models.FileField(upload_to="notes_files/", null=True, blank=True)
     create_time = models.DateTimeField(auto_now_add=True) 
     update_time = models.DateTimeField(auto_now=True) 
     status = models.BooleanField(default=True)
@@ -43,5 +44,9 @@ class ContactUs(models.Model):
       verbose_name_plural="ContacUs Forms"
       
     def __str__(self):
-        return self.full_name    
+        return self.full_name  
+
+class NoteFile(models.Model):
+    note = models.ForeignKey(Note,on_delete=models.CASCADE,related_name="files")
+    file = models.FileField(upload_to="notes_files/")  
         

@@ -222,3 +222,19 @@ input:focus{
 .toast.info{
     background: #3498db;
 }
+
+.forgot-password{
+    text-align: center;
+    margin: 10px 0;
+}
+
+.forgot-password a{
+    color: black;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight:bold;
+}
+
+.forgot-password a:hover{
+    text-decoration: underline;
+}

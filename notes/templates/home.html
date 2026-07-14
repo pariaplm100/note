@@ -7,13 +7,21 @@
         <!--toolbar-->
         <section class="toolbar">
             <div class="right">
-                <input type="text" placeholder="Search"/>
                 <button type="button" class="new" id="newBtn">+ New</button>
-            </div>
+                <input size=50  type="text" class="search-box" placeholder="Search"/>
+            </div >
+                <p class="right2">Click on + New to add your course information and notes.</p>
+                
         </section>
-        <div id="noteForm" class="note-form">
-            <input type="text" id="courseName" placeholder="Course Name">
-            <textarea id="courseNote" placeholder="Write your note..."></textarea>                <button id="saveBtn">Save</button>
+        <div id="noteModal" class="modal">
+            <div class="modal-content">
+                <p>Course Card</p>
+                <span class="close-btn" id="closeBtn">&times;</span>
+                <input type="text" id="courseName" placeholder="Course Name">
+                <textarea id="courseNote" placeholder="Write your note..."></textarea>
+                <input type="file" id="courseFiles" multiple>               
+                <button id="saveBtn">Save</button>
+            </div>    
         </div>
         <div class="notes-container">
             {% for note in notes %}
@@ -32,52 +40,113 @@
         <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
 <script>
 const newBtn = document.getElementById("newBtn");
-const noteForm = document.getElementById("noteForm");
+const noteModal = document.getElementById("noteModal");
+const closeBtn = document.getElementById("closeBtn");
 const saveBtn = document.getElementById("saveBtn");
 
+/* باز کردن پاپ‌آپ */
 newBtn.addEventListener("click", function () {
-    noteForm.style.display = "flex";
+    document.getElementById("courseName").value = "";
+    document.getElementById("courseNote").value = "";
+    document.getElementById("courseFiles").value = "";
+
+    noteModal.style.display = "flex";
 });
 
+/* بستن با ضربدر */
+closeBtn.addEventListener("click", function () {
+    noteModal.style.display = "none";
+
+    document.getElementById("courseName").value = "";
+    document.getElementById("courseNote").value = "";
+    document.getElementById("courseFiles").value = "";
+});
+
+/* بستن با کلیک بیرون از پنجره */
+window.addEventListener("click", function (event) {
+    if (event.target === noteModal) {
+        noteModal.style.display = "none";
+    }
+});
+
+/* ذخیره نوت */
 saveBtn.addEventListener("click", function () {
 
     const name = document.getElementById("courseName").value;
     const topic = document.getElementById("courseNote").value;
+    const files = document.getElementById("courseFiles").files;
+
+    if (name.trim() === "" || topic.trim() === "") {
+        alert("Please enter course name and note.");
+        return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("name", name);
+    formData.append("topic", topic);
+
+    /* اضافه کردن همه فایل‌ها */
+    for(let i = 0; i < files.length; i++){
+        formData.append("files", files[i]);
+    }
 
     fetch("{% url 'notes:create_note' %}", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
             "X-CSRFToken": document.getElementById("csrfToken").value
         },
-        body: JSON.stringify({
-            name: name,
-            topic: topic
-        })
+        body: formData
     })
     .then(response => response.json())
     .then(data => {
 
         const notesContainer = document.querySelector(".notes-container");
 
+        let filesHtml = "";
+
+        if(data.files && data.files.length > 0){
+            filesHtml += `
+                <div class="files-section">
+                    <h4>Files:</h4>
+            `;
+
+            data.files.forEach(function(file, index){
+                filesHtml += `
+                    <a href="${file.url}" target="_blank">
+                        ${file.name}
+                    </a><br>
+                `;
+            });
+
+            filesHtml += `</div>`;
+        }
+
         notesContainer.innerHTML += `
             <div class="note-card">
+
                 <div class="card-header">
                     <h2>${data.name}</h2>
                 </div>
 
                 <div class="card-body">
                     <p>${data.topic}</p>
+
+                    ${filesHtml}
                 </div>
+
             </div>
         `;
 
         document.getElementById("courseName").value = "";
         document.getElementById("courseNote").value = "";
+        document.getElementById("courseFiles").value = "";
 
-        noteForm.style.display = "none";
+        noteModal.style.display = "none";
+    })
+    .catch(error => {
+        console.error("Error:", error);
     });
 });
 </script>
-
 {% endblock %}

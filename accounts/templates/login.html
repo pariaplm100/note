@@ -56,6 +56,9 @@
         {% endif %}
 
         <button class="btn" type="submit">Login to account</button>
+        <div class="forgot-password">
+            <a href="{% url 'accounts:forgot_password' %}">Forgot Password ? </a>
+        </div>
     </form>
     
     <form method="POST" action="{% url 'accounts:signup' %}" id="registerForm" class="form">
@@ -64,7 +67,7 @@
 
         <input type="text" name="username" placeholder="Username" required>
         <input type="text" name="phone_number" placeholder="Phone Number" required>
-        <input type="email" name="email" placeholder="Email(Optional)">
+        <input type="email" name="email" placeholder="Email" required>
     <div class='password-row'>    
         <input type='password' id='id_password1' name='password1' placeholder='Password' class="{% if password_error %} input-error{% endif %}" required>
         <button type='button' class='show-password-button2' onclick="const inp = document.getElementById('id_password1'); inp.type = inp.type === 'password' ? 'text': 'password'; this.textContent = inp.type === 'password' ? 'Show': 'Hide'; ">Show</button>
