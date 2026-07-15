@@ -15,7 +15,7 @@ body{
     top: 0;
     width: 100%;
     height: 90px;
-    background: #90c8f36b;
+    background: #aedaf9;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -115,7 +115,6 @@ button{
 
 .note-card{
     width:100%;
-    height: 200px;
     min-height:120px;
     border:2px solid rgb(70, 78, 82);
     padding:20px;
@@ -139,6 +138,32 @@ button{
 .card-body p{
     font-family:"Vazirmatn", sans-serif;
     font-size:15px;
+}
+
+.files-section{
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    padding: 10px 0;
+    
+}
+
+.files-section h4{
+    top: 50px;
+}
+.files-section a{
+    flex-shrink: 0;
+    padding: 8px 14px;
+    background: #2eabdcb3;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+.files-section a:hover{
+    background: #126383b4;
 }
 
 .modal{
@@ -292,4 +317,29 @@ input[type="file"]::file-selector-button:hover{
 .toast.info{
     background: #3498db;
 
+}
+
+.card-actions{
+    justify-content: flex-end;!important
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.edit-btn,
+.delete-btn{
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    background: #2eaadc;
+    position: relative;
+    top: -135px;
+    left: 13px;
+}
+
+.edit-btn:hover,
+.delete-btn:hover{
+    background: #126383;
 }

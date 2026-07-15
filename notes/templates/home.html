@@ -25,27 +25,46 @@
         </div>
         <div class="notes-container">
             {% for note in notes %}
-                <div class="note-card">
-                    <div class="card-header">
-                        <h2>{{ note.name }}</h2>
-                    </div>
+            <div class="note-card" id="note-{{ note.id }}">
+                <div class="card-header">
+                    <h2>{{ note.name }}</h2>
+                </div>
 
-                    <div class="card-body">
-                        <p>{{ note.topic }}</p>
+                <div class="card-body">
+                    <p>{{ note.topic }}</p>
+                    {% if note.files.all %}
+                    <div class="files-section">
+                        <h4>Files:</h4>
+                        {% for file in note.files.all %}
+                            <a href="{{ file.file.url }}" target="_blank">{{ file.file.name|cut:"notes_files/" }}</a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="card-actions">
+                        <button class="edit-btn"  onclick="editNote({{ note.id }},'{{ note.name|escapejs }}','{{ note.topic|escapejs }}')">✏️ Edit</button>
+                        <button class="delete-btn"  onclick="deleteNote({{ note.id }})">🗑️ Delete</button>
                     </div>
                 </div>
-            {% endfor %}
-
+            </div>    
+            {% endfor %}    
         </div>
         <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
 <script>
+
 const newBtn = document.getElementById("newBtn");
 const noteModal = document.getElementById("noteModal");
 const closeBtn = document.getElementById("closeBtn");
 const saveBtn = document.getElementById("saveBtn");
 
-/* باز کردن پاپ‌آپ */
+let editingId = null;
+
+
+/* باز کردن پنجره برای ساخت نوت جدید */
 newBtn.addEventListener("click", function () {
+
+    editingId = null;
+
     document.getElementById("courseName").value = "";
     document.getElementById("courseNote").value = "";
     document.getElementById("courseFiles").value = "";
@@ -53,30 +72,36 @@ newBtn.addEventListener("click", function () {
     noteModal.style.display = "flex";
 });
 
-/* بستن با ضربدر */
+
+/* بستن پنجره */
 closeBtn.addEventListener("click", function () {
+
     noteModal.style.display = "none";
 
     document.getElementById("courseName").value = "";
     document.getElementById("courseNote").value = "";
     document.getElementById("courseFiles").value = "";
+
+    editingId = null;
 });
 
-/* بستن با کلیک بیرون از پنجره */
+
+/* بستن با کلیک بیرون */
 window.addEventListener("click", function (event) {
     if (event.target === noteModal) {
         noteModal.style.display = "none";
     }
 });
 
-/* ذخیره نوت */
+
+/* ذخیره یا ویرایش */
 saveBtn.addEventListener("click", function () {
 
     const name = document.getElementById("courseName").value;
     const topic = document.getElementById("courseNote").value;
     const files = document.getElementById("courseFiles").files;
 
-    if (name.trim() === "" || topic.trim() === "") {
+    if(name.trim() === "" || topic.trim() === ""){
         alert("Please enter course name and note.");
         return;
     }
@@ -86,32 +111,37 @@ saveBtn.addEventListener("click", function () {
     formData.append("name", name);
     formData.append("topic", topic);
 
-    /* اضافه کردن همه فایل‌ها */
     for(let i = 0; i < files.length; i++){
         formData.append("files", files[i]);
     }
 
-    fetch("{% url 'notes:create_note' %}", {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": document.getElementById("csrfToken").value
+    let url = "{% url 'notes:create_note' %}";
+
+    if(editingId !== null){
+        url = `/update-note/${editingId}/`;
+    }
+
+    fetch(url,{
+        method:"POST",
+        headers:{
+            "X-CSRFToken":
+                document.getElementById("csrfToken").value
         },
-        body: formData
+        body:formData
     })
     .then(response => response.json())
     .then(data => {
 
-        const notesContainer = document.querySelector(".notes-container");
-
         let filesHtml = "";
 
         if(data.files && data.files.length > 0){
+
             filesHtml += `
                 <div class="files-section">
                     <h4>Files:</h4>
             `;
 
-            data.files.forEach(function(file, index){
+            data.files.forEach(function(file){
                 filesHtml += `
                     <a href="${file.url}" target="_blank">
                         ${file.name}
@@ -122,31 +152,106 @@ saveBtn.addEventListener("click", function () {
             filesHtml += `</div>`;
         }
 
-        notesContainer.innerHTML += `
-            <div class="note-card">
-
+        const cardHtml = `
+            <div class="note-card" id="note-${data.id}">
                 <div class="card-header">
                     <h2>${data.name}</h2>
                 </div>
 
                 <div class="card-body">
+
                     <p>${data.topic}</p>
 
                     ${filesHtml}
-                </div>
 
+                    <div class="card-actions">
+
+                        <button class="edit-btn"
+                                onclick="editNote(
+                                    ${data.id},
+                                    '${data.name}',
+                                    '${data.topic}'
+                                )">
+                            Edit
+                        </button>
+
+                        <button class="delete-btn"
+                                onclick="deleteNote(${data.id})">
+                            Delete
+                        </button>
+
+                    </div>
+
+                </div>
             </div>
         `;
+
+        const notesContainer =
+            document.querySelector(".notes-container");
+
+        if(editingId === null){
+            notesContainer.innerHTML += cardHtml;
+        }
+        else{
+            document.getElementById(
+                `note-${editingId}`
+            ).outerHTML = cardHtml;
+        }
 
         document.getElementById("courseName").value = "";
         document.getElementById("courseNote").value = "";
         document.getElementById("courseFiles").value = "";
 
         noteModal.style.display = "none";
+
+        editingId = null;
     })
     .catch(error => {
-        console.error("Error:", error);
+        console.log(error);
     });
 });
+
+
+/* باز کردن پنجره ویرایش */
+function editNote(id,name,topic){
+
+    editingId = id;
+
+    document.getElementById("courseName").value = name;
+    document.getElementById("courseNote").value = topic;
+
+    noteModal.style.display = "flex";
+}
+
+
+/* حذف نوت */
+function deleteNote(id){
+
+    if(!confirm("Delete this note?")){
+        return;
+    }
+
+    fetch(`/delete-note/${id}/`,{
+        method:"POST",
+        headers:{
+            "X-CSRFToken":
+                document.getElementById("csrfToken").value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if(data.success){
+            document.getElementById(
+                `note-${id}`
+            ).remove();
+        }
+
+    })
+    .catch(error => {
+        console.log(error);
+    });
+}
+
 </script>
 {% endblock %}
