@@ -129,7 +129,9 @@ input:focus{
     left: 300px;
     color: rgb(0, 0, 0);
     background: transparent;    
-    background-color: #fffdfd;
+    background-color:#5c9ded;
+    color:#fff;
+    font-weight:bold;
     border: none;
     outline: none;
     cursor: pointer;

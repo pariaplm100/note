@@ -38,7 +38,7 @@ def signup_context(request, username="", email="", phone_number=""):
 
 def can_resend(request):
     last_resend = request.session.get("last_resend")
-    if last_resend and time() - last_resend < 60:
+    if last_resend and time() - last_resend < 120:
         return False
     return True
 
@@ -419,7 +419,7 @@ def verify_reset_password_view(request):
 
             request.session.pop("otp", None)
             request.session.pop("otp_time", None)
-
+            messages.success(request, "Verification successful.You can change password")
             return redirect("accounts:new_password")
 
         messages.error(request, "Verification code is incorrect.")

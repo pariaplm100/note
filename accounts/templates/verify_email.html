@@ -9,9 +9,6 @@
 </head>
 <body>
     
-<a href="javascript:history.back()" class="back-btn">
-    <span>←</span>
-</a>
 
 {% if messages %}
 <div id="toast-container">
@@ -24,6 +21,9 @@
 {% endif %}
 
 <div class="container">
+    
+        <a href="{% url 'accounts:login_page' %}" class='back-back'> <span>Back</span> 
+        </a>
 
     <div class="title">
         Verify Your Email
@@ -36,22 +36,18 @@
             We have sent a verification code to
             <br>
             <span>{{ email }}</span>
+            <br>
         </p>
+        
+        <p class='text-alert'>
+            <span>"if you not get code Check your Span files"</span>
+        </p>    
 
         <input type="text" name="otp" class="otp-input" maxlength="6" placeholder="Enter 6-digit code" autocomplete="one-time-code" required>
 
         <button type="submit" class="btn">
             Verify
         </button>
-    </form>
-    
-    <form method="POST">
-    {% csrf_token %}
-
-    <button type="submit" name="resend" value="1" class="resend-btn" id="resendBtn">Resend Code</button>
-
-    <p id="timer"></p>
-
     </form>
         
     <form method='post'>
@@ -68,7 +64,7 @@
 let lastResend = Number("{{ last_resend }}");
 let now = Math.floor(Date.now() / 1000);
 
-let remaining = 60 - (now - lastResend);
+let remaining = 120 - (now - lastResend);
 
 let btn = document.getElementById("resendBtn");
 let timer = document.getElementById("timer");

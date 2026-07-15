@@ -7,6 +7,3 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
-    
-class Note(models.Model):
-    session_key = models.CharField(max_length=100 ,null=True , blank=True )
