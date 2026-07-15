@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 {% load static %}
 <html lang="en">
+    
+    {% if messages %}
+    <div id="toast-container">
+        {% for message in messages %}
+            <div class="toast {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>    
+    {% endif %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

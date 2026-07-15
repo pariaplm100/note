@@ -11,6 +11,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.validators import validate_email
 from django.views.decorators.cache import never_cache
+from django.contrib.auth.decorators import login_required
 import re
 from random import randint
 from time import time
@@ -57,7 +58,11 @@ def send_otp(request, email):
         fail_silently=False,
     )
 
+
 def login_view(request):
+    if request.user.is_authenticated:
+        return redirect("notes:home")
+        
     if request.method == "POST":
 
         username = request.POST.get("username")
@@ -122,41 +127,44 @@ def login_view(request):
             
     return redirect("accounts:login_page")
     
-
+@login_required
 def logout_view(request):
     if request.user.is_authenticated:
+        messages.error(request, "Logged out successfully.")
         logout(request)
     return redirect(reverse('notes:home'))
     
     
-
 def signup_view(request):
+    if request.user.is_authenticated:
+        return redirect("notes:home")
+        
     if request.method == "POST":
-
+    
         user_captcha = request.POST.get("captcha")
         real_captcha = request.session.get("register_captcha")
         phone_number = request.POST.get("phone_number")
-        
+            
         username = request.POST.get("username")
         email = request.POST.get("email")
         password1 = request.POST.get("password1")
         password2 = request.POST.get("password2")
         phone_number = request.POST.get("phone_number")
-        
+            
         context = signup_context(
             request,
             username=username,
             email=email,
             phone_number=phone_number
         )
-        
+            
         if user_captcha != real_captcha:
             new_captcha = str(Captcha())
             request.session["register_captcha"] = new_captcha
             context["captcha2"] = new_captcha
             messages.error(request, "Captcha is incorrect.")
             return render(request, "login.html", context)
-
+    
         if password1 != password2:
             messages.error(request, "Passwords don't match.")
             return render(request, "login.html", context)
@@ -242,6 +250,9 @@ def signup_view(request):
 
 @never_cache
 def login_page(request):
+    if request.user.is_authenticated:
+        return redirect("notes:home")
+        
     login_captcha = str(Captcha())
     register_captcha = str(Captcha())
 
@@ -262,7 +273,9 @@ def login_page(request):
     
 @never_cache    
 def verify_email_view(request):
-
+    if request.user.is_authenticated:
+        return redirect("notes:home")
+    
     if request.method == "POST":
         
         if request.POST.get("resend"):
@@ -351,6 +364,8 @@ def verify_email_view(request):
     
 @never_cache    
 def forgot_password_view(request):
+    if request.user.is_authenticated:
+        return redirect("notes:home")
 
     if request.method == "POST":
         username = request.POST.get("username")
@@ -370,9 +385,12 @@ def forgot_password_view(request):
 
     return render(request, "forgot_password.html")
     
+    
 @never_cache    
 def verify_reset_password_view(request):
-
+    if request.user.is_authenticated:
+        return redirect("notes:home")
+        
     if request.method == "POST":
 
         if request.POST.get("resend"):
@@ -436,9 +454,11 @@ def verify_reset_password_view(request):
         "last_resend": request.session.get("last_resend", 0),
         "last_resend": request.session.get("last_resend", 0),
     })
-    
+
 @never_cache 
 def new_password_view(request):
+    if request.user.is_authenticated:
+        return redirect("notes:home")
 
     if not request.session.get("reset_verified"):
         return redirect("accounts:forgot_password")

@@ -6,16 +6,19 @@ from django.contrib import messages
 from notes.forms import AboutusForm,ContactUsForm
 from .models import *
 from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+
 
 def ContactUs_view(request):
     if request.method == "POST":
         form = ContactUsForm(request.POST)
+        messages.success(request, "Your message has been sent successfully. Thank you for contacting us!")
         if form.is_valid():
             form.save()
             return redirect("notes:ContactUs")
     else:
         form = ContactUsForm()
-        
+    
     return render(request, "contact-us.html", {"form": form})
     
 def AboutUs_view(request):
@@ -28,11 +31,14 @@ def AboutUs_view(request):
         form = AboutusForm()
     return render(request, "AboutUs.html", {"form": form})
        
+       
 def home(request):
     return render(request, "home.html")
 
+
 def profile_view(request):
     return render(request,'profile.html')
+    
     
 def home_view(request):
     if not request.session.session_key:
@@ -45,6 +51,7 @@ def home_view(request):
     context = {"notes": notes}
     return render(request, "home.html", context)
 
+@login_required
 def create_note(request):
     if request.method == "POST":
         
@@ -85,8 +92,10 @@ def create_note(request):
 
     return JsonResponse({"error": "Invalid request"},status=400)
 
+
+@login_required
 @require_POST
 def delete_note(request, note_id):
-    note = Note.objects.get(id=note_id)
+    note = Note.objects.get(id=note_id,author=request.user)
     note.delete()
     return JsonResponse({"success": True})

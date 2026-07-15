@@ -52,6 +52,9 @@
         <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
 <script>
 
+const isAuthenticated =
+    {% if request.user.is_authenticated %}true{% else %}false{% endif %};    
+
 const newBtn = document.getElementById("newBtn");
 const noteModal = document.getElementById("noteModal");
 const closeBtn = document.getElementById("closeBtn");
@@ -62,6 +65,11 @@ let editingId = null;
 
 /* باز کردن پنجره برای ساخت نوت جدید */
 newBtn.addEventListener("click", function () {
+    
+    if (!isAuthenticated) {
+        window.location.href = "{% url 'accounts:login_page' %}";
+        return;
+    }
 
     editingId = null;
 
@@ -224,7 +232,6 @@ function editNote(id,name,topic){
 }
 
 
-/* حذف نوت */
 function deleteNote(id){
 
     if(!confirm("Delete this note?")){
