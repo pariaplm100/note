@@ -19,6 +19,40 @@
         {% endfor %}
     </div>    
     {% endif %}
+    
+    <button id="menuBtn" class="menu-btn">☰</button>
+    
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h3>My Courses</h3>
+        </div>
+        <div class="sidebar-body">
+            {% for course in courses %}
+                <div class="course">
+                    <div class="course-title">
+                        <span class="arrow">▶</span>
+                        {{ course.name }}
+                    </div>
+
+                    <div class="notes-list">
+                        {% for note in course.notes.all %}
+                            <div class="note-item" class="note-item" onclick="goToNote({{ note.id }})">
+                                
+                                📄 {{ note.name }}
+                            </div>
+                        {% empty %}
+                            <div class="note-item">
+                                No notes
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% empty %}
+                <p>No courses yet.</p>
+            {% endfor %}
+        </div>
+        </div>
+    
     <div class="container">
         <header class="page-header">
             <nav class="navbar">
@@ -55,6 +89,52 @@
                 setTimeout(() => {msg.remove();}, 300);
             });
         }, 2500);
+        
+    const menuBtn = document.getElementById("menuBtn");
+    const sidebar = document.getElementById("sidebar");
+
+    menuBtn.addEventListener("click", function(){
+        sidebar.classList.toggle("active");
+    });
+    
+    const courseTitles = document.querySelectorAll(".course-title");
+    courseTitles.forEach(function(title){
+        title.addEventListener("click", function(){
+            
+            const notes = this.nextElementSibling;
+
+            if(notes.style.display === "block"){
+                
+                notes.style.display = "none";
+                this.innerHTML =
+                    "▶ " + this.textContent.substring(2);
+            }
+            
+            else{
+                notes.style.display = "block";
+                this.innerHTML =
+                    "▼ " + this.textContent.substring(2);
+            }
+
+        });
+    });
+    
+    function goToNote(id){
+        const card = document.getElementById(`note-${id}`);
+
+        if(card){
+            card.scrollIntoView({
+                behavior:"smooth",
+                block:"start"
+            });
+
+            card.classList.add("highlight");
+            setTimeout(function(){
+                card.classList.remove("highlight");
+            },1500);
+        }
+    }
+    
     </script>    
     
 </body>

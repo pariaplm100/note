@@ -7,6 +7,7 @@ from notes.forms import AboutusForm,ContactUsForm
 from .models import *
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
 
 
 def ContactUs_view(request):
@@ -41,61 +42,104 @@ def profile_view(request):
     
     
 def home_view(request):
-    if not request.session.session_key:
-        request.session.create()
     if request.user.is_authenticated:
-        notes = Note.objects.filter(author=request.user)
+        notes = Note.objects.filter(course__author=request.user)
+        courses = Course.objects.filter(author=request.user)
     else:
-        notes = Note.objects.filter(session_key=request.session.session_key)
+        notes = Note.objects.none()
+        courses = []
 
-    context = {"notes": notes}
+    context = {
+        "notes": notes,
+        "courses": courses,
+    }
+    
     return render(request, "home.html", context)
 
 @login_required
+@require_POST
 def create_note(request):
-    if request.method == "POST":
-        
-        if not request.session.session_key:
-            request.session.create()
 
-        
+    name = request.POST.get("name")
+    topic = request.POST.get("topic")
 
-        name = request.POST.get("name")
-        topic = request.POST.get("topic")
-        uploaded_files = request.FILES.getlist("files")
+    course_name = request.POST.get("course_name")
 
-        note = Note.objects.create( 
-            author=request.user if request.user.is_authenticated else None,
-            session_key = request.session.session_key,
-            name=name,
-           topic=topic)
-        for file in uploaded_files:
+    course, created = Course.objects.get_or_create(
+        author=request.user,
+        name=course_name
+    )
+
+    note = Note.objects.create(
+        author=request.user if request.user.is_authenticated else None,
+        course=course,
+        name=request.POST.get("name"),
+        topic=request.POST.get("topic")
+    )
+    
+    for file in uploaded_files:
             NoteFile.objects.create(
                 note=note,
                 file=file
             )
 
+    files_data = []
+
+    for f in note.files.all():
+        files_data.append({
+                "name": f.file.name.split("/")[-1],
+                "url": f.file.url
+            })
+        note_file = NoteFile.objects.create(
+            note=note,
+            file=file
+        )
+
+        files_data.append({
+            "name": note_file.file.name.split("/")[-1],
+            "url": note_file.file.url
+        })
+
+
+    return JsonResponse({
+        "id": note.id,
+        "name": note.name,
+        "topic": note.topic,
+        "files": files_data
+    })
+    return JsonResponse({"error": "Invalid request"},status=400)
+
+@login_required
+@require_POST
+def delete_note(request, note_id):
+    if request.method == "POST":
+        note = Note.objects.get(id=note_id)
+        note.name = request.POST.get("name")
+        note.topic = request.POST.get("topic")
+        note.save()
         files_data = []
 
         for f in note.files.all():
             files_data.append({
                 "name": f.file.name.split("/")[-1],
-                "url": f.file.url
-            })
+                "url": f.file.url})
 
-        return JsonResponse({
-            "id": note.id,
-            "name": note.name,
-            "topic": note.topic,
-            "files": files_data
-            })
+        return JsonResponse({"id": note.id,"name": note.name, "topic": note.topic, "files": files_data})
+    return JsonResponse({"error":"invalid request"}, status=400)
+    
+def update_note(request, note_id):
 
-    return JsonResponse({"error": "Invalid request"},status=400)
+    if request.method == "POST":
+        note = Note.objects.get(id=note_id)
+        note.name = request.POST.get("name")
+        note.topic = request.POST.get("topic")
+        note.save()
+        files_data = []
 
+        for f in note.files.all():
+            files_data.append({
+                "name": f.file.name.split("/")[-1],
+                "url": f.file.url})
 
-@login_required
-@require_POST
-def delete_note(request, note_id):
-    note = Note.objects.get(id=note_id,author=request.user)
-    note.delete()
-    return JsonResponse({"success": True})
+        return JsonResponse({"id": note.id,"name": note.name, "topic": note.topic, "files": files_data})
+    return JsonResponse({"error":"invalid request"}, status=400)    

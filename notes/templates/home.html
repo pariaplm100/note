@@ -11,6 +11,7 @@
                 <input size=50  type="text" class="search-box" placeholder="Search"/>
             </div >
                 <p class="right2">Click on + New to add your course information and notes.</p>
+                <p class="right3"></p>
                 
         </section>
         <div id="noteModal" class="modal">
@@ -18,6 +19,8 @@
                 <p>Course Card</p>
                 <span class="close-btn" id="closeBtn">&times;</span>
                 <input type="text" id="courseName" placeholder="Course Name">
+                
+                
                 <textarea id="courseNote" placeholder="Write your note..."></textarea>
                 <input type="file" id="courseFiles" multiple>               
                 <button id="saveBtn">Save</button>
@@ -42,8 +45,8 @@
                     {% endif %}
 
                     <div class="card-actions">
-                        <button class="edit-btn"  onclick="editNote({{ note.id }},'{{ note.name|escapejs }}','{{ note.topic|escapejs }}')">✏️ Edit</button>
-                        <button class="delete-btn"  onclick="deleteNote({{ note.id }})">🗑️ Delete</button>
+                        <button class="edit-btn"  onclick="editNote({{ note.id }},'{{ note.name|escapejs }}','{{ note.topic|escapejs }}')">&#9998;Edit</button>
+                        <button class="delete-btn"  onclick="deleteNote({{ note.id }})">️&#10008;Delete</button>
                     </div>
                 </div>
             </div>    
@@ -51,9 +54,8 @@
         </div>
         <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
 <script>
-
 const isAuthenticated =
-    {% if request.user.is_authenticated %}true{% else %}false{% endif %};    
+    {% if request.user.is_authenticated %}true{% else %}false{%endif %};    
 
 const newBtn = document.getElementById("newBtn");
 const noteModal = document.getElementById("noteModal");
@@ -63,9 +65,9 @@ const saveBtn = document.getElementById("saveBtn");
 let editingId = null;
 
 
-/* باز کردن پنجره برای ساخت نوت جدید */
+
 newBtn.addEventListener("click", function () {
-    
+
     if (!isAuthenticated) {
         window.location.href = "{% url 'accounts:login_page' %}";
         return;
@@ -81,7 +83,6 @@ newBtn.addEventListener("click", function () {
 });
 
 
-/* بستن پنجره */
 closeBtn.addEventListener("click", function () {
 
     noteModal.style.display = "none";
@@ -94,7 +95,7 @@ closeBtn.addEventListener("click", function () {
 });
 
 
-/* بستن با کلیک بیرون */
+
 window.addEventListener("click", function (event) {
     if (event.target === noteModal) {
         noteModal.style.display = "none";
@@ -102,12 +103,14 @@ window.addEventListener("click", function (event) {
 });
 
 
-/* ذخیره یا ویرایش */
+
 saveBtn.addEventListener("click", function () {
 
-    const name = document.getElementById("courseName").value;
+    const Course Name = document.getElementById("courseName").value;
+    const noteName = document.getElementById("noteName").value;
     const topic = document.getElementById("courseNote").value;
     const files = document.getElementById("courseFiles").files;
+    const courseId = document.getElementById("courseId").value;
 
     if(name.trim() === "" || topic.trim() === ""){
         alert("Please enter course name and note.");
@@ -116,15 +119,19 @@ saveBtn.addEventListener("click", function () {
 
     const formData = new FormData();
 
-    formData.append("name", name);
+    formData.append("course_name", courseName);
+    formData.append("name", noteName);
     formData.append("topic", topic);
 
     for(let i = 0; i < files.length; i++){
         formData.append("files", files[i]);
     }
 
-    let url = "{% url 'notes:create_note' %}";
+    let url;
 
+    if(editingId !== null){url = "{% url 'notes:create_note' %}";}
+    else{url = `/update-note/${editingId}/`;}
+    
     if(editingId !== null){
         url = `/update-note/${editingId}/`;
     }
@@ -220,7 +227,7 @@ saveBtn.addEventListener("click", function () {
 });
 
 
-/* باز کردن پنجره ویرایش */
+
 function editNote(id,name,topic){
 
     editingId = id;

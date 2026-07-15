@@ -1,20 +1,34 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+class Course(models.Model):
+    name = models.CharField(max_length=100)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)    
+    
+    
 class Note(models.Model):
-    author = models.ForeignKey(User,on_delete = models.SET_NULL,null=True , blank=True)
-    session_key = models.CharField(max_length=100 ,null=True , blank=True )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="notes"
+    )
+
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name="notes"
+    )
+
     name = models.CharField(max_length=100)
     topic = models.TextField(max_length=200)
-    create_time = models.DateTimeField(auto_now_add=True) 
-    update_time = models.DateTimeField(auto_now=True) 
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
     status = models.BooleanField(default=True)
+
     class Meta:
-      ordering = ["create_time"]
-      verbose_name="Note's"
-      verbose_name_plural="Note's"
-    
-    def __str__(self): 
+        ordering = ["create_time"]
+
+    def __str__(self):
         return f"{self.name}-{self.create_time}"
         
 class AboutUs(models.Model):
@@ -50,3 +64,5 @@ class NoteFile(models.Model):
     note = models.ForeignKey(Note,on_delete=models.CASCADE,related_name="files")
     file = models.FileField(upload_to="notes_files/")  
         
+        
+    
