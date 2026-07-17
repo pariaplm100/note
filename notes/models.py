@@ -7,18 +7,8 @@ class Course(models.Model):
     
     
 class Note(models.Model):
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="notes"
-    )
-
-    course = models.ForeignKey(
-        Course,
-        on_delete=models.CASCADE,
-        related_name="notes"
-    )
-
+    author = models.ForeignKey( User, on_delete=models.CASCADE, related_name="notes")
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="notes")
     name = models.CharField(max_length=100)
     topic = models.TextField(max_length=200)
     create_time = models.DateTimeField(auto_now_add=True)
@@ -30,6 +20,7 @@ class Note(models.Model):
 
     def __str__(self):
         return f"{self.name}-{self.create_time}"
+        
         
 class AboutUs(models.Model):
     name = models.CharField(max_length=100)

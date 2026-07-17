@@ -22,7 +22,7 @@ def signup_context(request, username="", email="", phone_number=""):
     register_captcha = str(Captcha())
     request.session["login_captcha"] = login_captcha
     request.session["register_captcha"] = register_captcha
-
+    
     return {
         "captcha1": login_captcha,
         "captcha2": register_captcha,
@@ -65,26 +65,29 @@ def login_view(request):
         
     if request.method == "POST":
 
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        user_captcha = request.POST.get("captcha")
-        phone_number= request.POST.get("phone_number")
-  
+        username = request.POST.get("username","").strip()
+        password = request.POST.get("password","").strip()
+        user_captcha = request.POST.get("captcha").strip()
+        phone_number= request.POST.get("phone_number","").strip()
 
         real_captcha = request.session.get("login_captcha")
-
-        new_captcha = str(Captcha())
-        request.session["login_captcha"] = new_captcha
+        new_login_captcha = Captcha()
+        new_register_captcha = Captcha()
+        request.session["login_captcha"] = new_login_captcha
+        request.session["register_captcha"] = new_register_captcha
         
         context = {
-        "captcha1" : new_captcha,
+        "captcha1" : new_login_captcha,
+        "captcha2" : new_register_captcha,
         "username": username,
         "username_error" : "",
         "password_error" : "",
         "captcha_error" : "",
         "show_login": request.session.pop("show_login", False),
     }
-        
+        if " " in username or " " in password:
+            messages.error(request, "Username and password cannot contain spaces.")
+            return render(request, "login.html", context)
             
         #if not re.fullmatch(r"09\d{9}", phone_number):
             #messages.error(request,"Invalid phone number.")
@@ -141,15 +144,16 @@ def signup_view(request):
         
     if request.method == "POST":
     
-        user_captcha = request.POST.get("captcha")
-        real_captcha = request.session.get("register_captcha")
-        phone_number = request.POST.get("phone_number")
+        user_captcha = request.POST.get("captcha","").strip()
+        real_captcha = request.session.get("register_captcha","").strip()
+        phone_number = request.POST.get("phone_number","").strip()
             
-        username = request.POST.get("username")
-        email = request.POST.get("email")
-        password1 = request.POST.get("password1")
-        password2 = request.POST.get("password2")
-        phone_number = request.POST.get("phone_number")
+        username = request.POST.get("username","").strip()
+        email = request.POST.get("email","").strip()
+        password1 = request.POST.get("password1","").strip()
+        password2 = request.POST.get("password2","").strip()
+        phone_number = request.POST.get("phone_number","").strip()
+        
             
         context = signup_context(
             request,
@@ -157,6 +161,14 @@ def signup_view(request):
             email=email,
             phone_number=phone_number
         )
+        
+        if " " in username:
+            messages.error(request, "Username cannot contain spaces.")
+            return render(request, "login.html", context)
+
+        if " " in password1 or " " in password2:
+            messages.error(request, "Password cannot contain spaces.")
+            return render(request, "login.html", context)
             
         if user_captcha != real_captcha:
             new_captcha = str(Captcha())
@@ -368,7 +380,7 @@ def forgot_password_view(request):
         return redirect("notes:home")
 
     if request.method == "POST":
-        username = request.POST.get("username")
+        username = request.POST.get("username","").strip()
 
         if not User.objects.filter(username=username).exists():
             messages.error(request, "Username does not exist.")
@@ -464,9 +476,13 @@ def new_password_view(request):
         return redirect("accounts:forgot_password")
 
     if request.method == "POST":
-        password1 = request.POST.get("password1")
-        password2 = request.POST.get("password2")
+        password1 = request.POST.get("password1","").strip()
+        password2 = request.POST.get("password2","").strip()
 
+        if " " in password1 or " " in password2:
+            messages.error(request, "Password cannot contain spaces.")
+            return redirect("accounts:new_password")
+            
         if password1 != password2:
             messages.error(request, "Passwords don't match.")
             return redirect("accounts:new_password")

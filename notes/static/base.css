@@ -111,18 +111,13 @@ body{
 .toast{
     min-width: 260px;
     max-width: 350px;
-
     padding: 14px 18px;
     border-radius: 10px;
-
     color: white;
     font-size: 15px;
-
     box-shadow: 0 8px 20px rgba(0,0,0,.25);
-
     opacity: 1;
     transition: opacity .5s ease, transform .5s ease;
-
     transform: translateX(0);
 }
 
@@ -167,14 +162,34 @@ body{
 }
 
 .sidebar-header{
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
     padding: 20px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #4472c2;
     font-size: 20px;
     font-weight: bold;
 }
 
+.close-sidebar{
+    background:none;
+    border:none;
+    font-size:28px;
+    color:#000000; 
+    cursor:pointer;
+    font-weight:bold;
+    margin-left:auto;
+    
+}
+
+.close-sidebar:hover{
+    color: #4472c2;
+}
+
 .sidebar-body{
     padding: 15px;
+    height: calc(100vh - 80px);
+    overflow-y: auto;
 }
 
 .course-item{
@@ -224,7 +239,7 @@ body{
 
 @keyframes flash{
     0%{
-        background:#fff8a6;
+        background:hsla(203, 58%, 76%, 0.631);
     }
     100%{
         background:white;
@@ -239,4 +254,19 @@ body{
 
 .note-item{
     margin-left:25px;
+}
+
+.sidebar-note-wrapper{
+    margin-bottom: 10px;
+}
+
+.sidebar-files{
+    margin-left: 40px;
+    margin-top: 5px;
+}
+
+.sidebar-file{
+    font-size: 13px;
+    color: #666;
+    padding: 4px 0;
 }

@@ -325,7 +325,7 @@ input[type="file"]::file-selector-button:hover{
 }
 
 .card-actions{
-    justify-content: flex-end;!important
+    justify-content: flex-end !important;
     margin-top: 15px;
     display: flex;
     gap: 10px;

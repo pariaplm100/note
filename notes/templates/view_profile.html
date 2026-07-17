@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Profile</title>
+
+    <link rel="stylesheet" href="{% static 'view_profile.css' %}">
+</head>
+
+<body>
+
+<a href="javascript:history.back()" class="back-btn">
+    <span>←</span>
+</a>
+
+{% if messages %}
+    <div id="toast-container">
+        {% for message in messages %}
+            <div class="toast {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>    
+    {% endif %}
+    
+<div class="container">
+
+    <div class="profile-card">
+
+        {% if profile.image %}
+            <img src="{{ profile.image.url }}" class="profile-image">
+        {% else %}
+            <img src="https://rasanika.com/storage/i/17263/11XRGPqMYoSnic0zJ1uVJcl2/orig-900/image--rasanika.com.webp"
+                 class="profile-image">
+        {% endif %}
+
+        <h2>{{ request.user.username }}</h2>
+
+        <div class="info">
+
+            <h4>Email</h4>
+            <p>{{ request.user.email }}</p>
+
+            <h4>Phone Number</h4>
+            <p>{{ profile.phone_number }}</p>
+
+            <h4>Bio</h4>
+
+            {% if profile.bio %}
+                <p>{{ profile.bio }}</p>
+            {% else %}
+                <p class="empty">
+                    No bio yet.
+                </p>
+            {% endif %}
+
+            <h4>Joined</h4>
+            <p>{{ request.user.date_joined|date:"d M Y" }}</p>
+
+        </div>
+
+        <div class="statistics">
+
+            <div class="box">
+                <h3>{{ courses_count }}</h3>
+                <span>Courses</span>
+            </div>
+
+            <div class="box">
+                <h3>{{ notes_count }}</h3>
+                <span>Notes</span>
+            </div>
+
+        </div>
+
+        <a href="{% url 'notes:edit_profile' %}">
+            <button class="edit-btn">
+                Edit Profile
+            </button>
+        </a>
+
+    </div>
+
+</div>
+<script>
+    setTimeout(() => {
+            document.querySelectorAll(".toast").forEach(msg => {
+                msg.style.opacity = "0";
+                msg.style.transform = "translateX(100px)";
+                setTimeout(() => {msg.remove();}, 300);
+            });
+        }, 2500);
+</script>        
+
+</body>
+</html>

@@ -24,35 +24,49 @@
     
     <div id="sidebar" class="sidebar">
         <div class="sidebar-header">
+            
             <h3>My Courses</h3>
+            <button id="closeSidebarBtn" class="close-sidebar">&times;</button>
         </div>
         <div class="sidebar-body">
             {% for course in courses %}
-                <div class="course">
+                <div class="course" id="course-{{ course.id }}">
                     <div class="course-title">
-                        <span class="arrow">▶</span>
+                        <span class="arrow">&#9656;</span>
                         {{ course.name }}
                     </div>
 
-                    <div class="notes-list">
+                    <div class="notes-list" id="notes-list-{{ course.id }}">
                         {% for note in course.notes.all %}
-                            <div class="note-item" class="note-item" onclick="goToNote({{ note.id }})">
-                                
-                                📄 {{ note.name }}
+                            <div class="sidebar-note-wrapper">
+                                <div class="note-item"  id="sidebar-note-{{ note.id }}"  onclick="goToNote({{ note.id }})">
+                                    &#9113; {{ note.name }}
+                                </div>
+                                <div class="sidebar-files"  id="sidebar-files-{{ note.id }}">
+
+                                    {% for file in note.files.all %}
+                                        <div class="sidebar-file">
+                                            📄 {{ file.file.name|cut:"notes_files/" }}
+                                        </div>
+                                    {% endfor %}
+
+                                </div>
+
                             </div>
+
                         {% empty %}
                             <div class="note-item">
                                 No notes
                             </div>
                         {% endfor %}
-                    </div>
+                    </div> 
+                
                 </div>
             {% empty %}
                 <p>No courses yet.</p>
             {% endfor %}
         </div>
-        </div>
-    
+        </div>   
     <div class="container">
         <header class="page-header">
             <nav class="navbar">
@@ -92,9 +106,14 @@
         
     const menuBtn = document.getElementById("menuBtn");
     const sidebar = document.getElementById("sidebar");
+    const closeSidebarBtn =document.getElementById("closeSidebarBtn");
 
     menuBtn.addEventListener("click", function(){
         sidebar.classList.toggle("active");
+    });
+
+    closeSidebarBtn.addEventListener("click", function(){
+        sidebar.classList.remove("active");
     });
     
     const courseTitles = document.querySelectorAll(".course-title");
@@ -107,13 +126,13 @@
                 
                 notes.style.display = "none";
                 this.innerHTML =
-                    "▶ " + this.textContent.substring(2);
+                    "&#9656; " + this.textContent.substring(2);
             }
             
             else{
                 notes.style.display = "block";
                 this.innerHTML =
-                    "▼ " + this.textContent.substring(2);
+                    "&#9663; " + this.textContent.substring(2);
             }
 
         });
@@ -134,6 +153,18 @@
             },1500);
         }
     }
+    document.addEventListener("click", function(event){
+
+       if(
+        sidebar.classList.contains("active") &&
+        !sidebar.contains(event.target) &&
+        !menuBtn.contains(event.target)
+        ){
+        sidebar.classList.remove("active");
+        }
+
+    }); 
+
     
     </script>    
     

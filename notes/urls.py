@@ -12,4 +12,10 @@ urlpatterns = [
     path("create-note/", views.create_note, name="create_note"),
     path("delete-note/<int:note_id>/",views.delete_note,name="delete_note"),
     path("update-note/<int:note_id>/", views.update_note, name="update_note"),
+    path("verify_delete_account",views.verify_delete_account_view,name="verify_delete_account"),
+    path("delete-account/",views.delete_account,name="delete_account"),
+    path("confirm_delete_account",views.confirm_delete_account,name= 'confirm_delete_account'),
+    path("view-profile/",views.view_profile,name="view_profile"),
+    path("edit-profile/",views.edit_profile,name="edit_profile"),
+    path("Course&Notes/", views.courses_notes, name="Course_Notes"),
 ]

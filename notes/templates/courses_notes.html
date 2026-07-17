@@ -1,0 +1,57 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses and Notes</title>
+
+    <link rel="stylesheet" href="{% static 'courses_notes.css' %}">
+</head>
+<body>
+<div class="container">
+
+    <h1 class="title">Courses and Notes</h1>
+    <form method="GET" class="search-box">
+        
+        <input type="text" name="search" placeholder="Search..." value="{{ search }}" >
+        <button type="submit"> Search </button>
+        
+    </form>
+
+    {% if page_obj %}
+        {% for note in page_obj %}
+        <div class="note-card">
+            
+            <h3>{{ note.name }}</h3>
+            <p>{{ note.topic|truncatewords:25 }}</p>
+            
+        </div>
+        {% endfor %}
+    {% else %}
+    
+        <p class="empty">
+            No notes found.
+        </p>
+    {% endif %}
+
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&search={{ search }}">
+                Previous
+            </a>
+        {% endif %}
+        <span>
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&search={{ search }}">
+                Next
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

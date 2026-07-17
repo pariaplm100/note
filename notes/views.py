@@ -2,13 +2,61 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse,JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
+from django.contrib.auth import logout
 from django.contrib import messages
 from notes.forms import AboutusForm,ContactUsForm
-from .models import *
+from django.core.mail import send_mail
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
+from django.views.decorators.cache import never_cache
+from django.core.paginator import Paginator
+from django.db.models import Q
+from .models import Course, Note
+from random import randint
+from time import time
+from .models import *
 
+@login_required
+def courses_notes(request):
+    search = request.GET.get("search", "").strip()
+    notes = Note.objects.filter(author=request.user).order_by("-create_time")
+
+    if search:
+        notes = notes.filter(
+            Q(name__icontains=search) |
+            Q(topic__icontains=search) )
+
+    paginator = Paginator(notes, 4)
+
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    context = {"page_obj": page_obj,"search": search}
+
+    return render(request, "courses_notes.html", context)
+
+def can_resend(request):
+    last_resend = request.session.get("last_resend")
+    if last_resend and time() - last_resend < 120:
+        return False
+    return True
+
+def send_otp(request, email):
+    otp = str(randint(100000, 999999))
+
+    request.session["otp"] = otp
+    request.session["otp_time"] = int(time())
+    request.session["last_resend"] = int(time())
+
+    send_mail(
+        subject="Verification Code",
+        message=f"Your verification code is: {otp}",
+        from_email=None,
+        recipient_list=[email],
+        fail_silently=False,
+    )
+    
 
 def ContactUs_view(request):
     if request.method == "POST":
@@ -47,7 +95,7 @@ def home_view(request):
         courses = Course.objects.filter(author=request.user)
     else:
         notes = Note.objects.none()
-        courses = []
+        courses = Course.objects.none()
 
     context = {
         "notes": notes,
@@ -59,7 +107,9 @@ def home_view(request):
 @login_required
 @require_POST
 def create_note(request):
-
+    
+    uploaded_files = request.FILES.getlist("files")
+    
     name = request.POST.get("name")
     topic = request.POST.get("topic")
 
@@ -71,75 +121,199 @@ def create_note(request):
     )
 
     note = Note.objects.create(
-        author=request.user if request.user.is_authenticated else None,
+        author=request.user,
         course=course,
-        name=request.POST.get("name"),
-        topic=request.POST.get("topic")
+        name=name,
+        topic=topic,
     )
     
     for file in uploaded_files:
-            NoteFile.objects.create(
-                note=note,
-                file=file
-            )
-
+        NoteFile.objects.create(
+            note=note,
+            file=file
+        )
+    
     files_data = []
-
+    
+    
     for f in note.files.all():
         files_data.append({
                 "name": f.file.name.split("/")[-1],
                 "url": f.file.url
             })
-        note_file = NoteFile.objects.create(
-            note=note,
-            file=file
-        )
-
-        files_data.append({
-            "name": note_file.file.name.split("/")[-1],
-            "url": note_file.file.url
-        })
-
 
     return JsonResponse({
         "id": note.id,
         "name": note.name,
         "topic": note.topic,
-        "files": files_data
+        "files": files_data,
+        "course_id": course.id,
+        "course_name": course.name,
     })
-    return JsonResponse({"error": "Invalid request"},status=400)
+    
 
 @login_required
 @require_POST
 def delete_note(request, note_id):
-    if request.method == "POST":
-        note = Note.objects.get(id=note_id)
-        note.name = request.POST.get("name")
-        note.topic = request.POST.get("topic")
-        note.save()
-        files_data = []
+    try:
+        note = Note.objects.get(id=note_id  ,  author=request.user)
+        course_id = note.course.id
+        note.delete()
 
-        for f in note.files.all():
-            files_data.append({
-                "name": f.file.name.split("/")[-1],
-                "url": f.file.url})
-
-        return JsonResponse({"id": note.id,"name": note.name, "topic": note.topic, "files": files_data})
-    return JsonResponse({"error":"invalid request"}, status=400)
+        return JsonResponse({"success": True,"course_id": course_id})
+    except Note.DoesNotExist:
+        return JsonResponse({"success": False,"error": "Note not found"}, status=404)
     
+    
+@login_required
+@require_POST    
 def update_note(request, note_id):
+    try:
+        note = Note.objects.get(id=note_id, author=request.user)
 
-    if request.method == "POST":
-        note = Note.objects.get(id=note_id)
         note.name = request.POST.get("name")
         note.topic = request.POST.get("topic")
         note.save()
+
         files_data = []
 
         for f in note.files.all():
             files_data.append({
                 "name": f.file.name.split("/")[-1],
-                "url": f.file.url})
+                "url": f.file.url
+            })
 
-        return JsonResponse({"id": note.id,"name": note.name, "topic": note.topic, "files": files_data})
-    return JsonResponse({"error":"invalid request"}, status=400)    
+        return JsonResponse({
+            "id": note.id,
+            "name": note.name,
+            "topic": note.topic,
+            "files": files_data,
+        })
+
+    except Note.DoesNotExist:
+        return JsonResponse({
+            "error": "Note not found"
+        }, status=404)
+        
+       
+@login_required
+def confirm_delete_account(request):
+    return render(request, "confirm_delete_account.html")    
+    
+    
+@login_required
+def delete_account(request):
+    send_otp(request, request.user.email)
+    return redirect("notes:verify_delete_account")    
+    
+
+@login_required
+@never_cache
+def verify_delete_account_view(request):
+
+    if request.method == "POST":
+
+        if request.POST.get("resend"):
+            if not can_resend(request):
+                messages.error(request,"Please wait 60 seconds before requesting another code.")
+                return redirect("notes:verify_delete_account")
+
+            send_otp(request, request.user.email)
+
+            messages.success(
+                request,
+                "A new verification code has been sent."
+            )
+
+            return redirect("notes:verify_delete_account")
+
+        user_otp = request.POST.get("otp")
+        real_otp = request.session.get("otp")
+        otp_time = request.session.get("otp_time")
+
+        if otp_time is None:
+            messages.error(request, "Verification code has expired.")
+            return redirect("notes:profile")
+
+        if time() - otp_time > 120:
+
+            request.session.pop("otp", None)
+            request.session.pop("otp_time", None)
+
+            messages.error(request, "Verification code has expired.")
+
+            return redirect("notes:verify_delete_account")
+
+        if user_otp == real_otp:
+
+            request.session.pop("otp", None)
+            request.session.pop("otp_time", None)
+
+            user = request.user
+
+            logout(request)
+            user.delete()
+
+            messages.success(
+                request,
+                "Your account has been deleted successfully."
+            )
+
+            return redirect("notes:home")
+
+        messages.error(request, "Verification code is incorrect.")
+
+    return render(request, "verify_delete_account.html", {
+        "email": request.user.email,
+        "last_resend": request.session.get("last_resend", 0),
+    })
+    
+
+@login_required
+def view_profile(request):
+
+    profile = request.user.profile
+
+    courses_count = Course.objects.filter(author=request.user).count()
+
+    notes_count = Note.objects.filter(author=request.user).count()
+
+    context = {
+        "profile": profile,
+        "courses_count": courses_count,
+        "notes_count": notes_count,
+    }
+
+    return render(request,"view_profile.html",context)
+    
+
+@login_required
+def edit_profile(request):
+    profile = request.user.profile
+
+    if request.method == "POST":
+        username = request.POST.get("username").strip()
+        bio = request.POST.get("bio","")
+        
+        if " " in username:
+            messages.error(request, "Username cannot contain spaces.")
+            return render(request, "edit_profile.html", {"profile": profile})
+            
+        if User.objects.filter(username=username).exclude(id=request.user.id).exists():
+            messages.error(request, "This username is already taken.")
+            return render(request, "edit_profile.html", {"profile": profile})
+        
+        request.user.username = username
+        request.user.save()
+        
+        profile.bio = bio
+
+        if "image" in request.FILES:
+            profile.image = request.FILES["image"]
+
+        profile.save()
+
+        messages.success(request, "Profile updated successfully.")
+        return redirect("notes:view_profile")
+
+    return render(request, "edit_profile.html", {"profile": profile})

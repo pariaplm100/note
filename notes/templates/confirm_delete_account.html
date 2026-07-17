@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Account</title>
+
+    <link rel="stylesheet" href="{% static 'confirm_delete_account.css' %}">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="title">
+        Delete Account
+    </div>
+    <div class="warning-icon">
+        ⚠️
+    </div>
+    <p class="warning-text">
+        Are you sure you want to delete your account?
+    </p>
+
+    <p class="description">
+        This action is permanent and cannot be undone.
+        <br>
+        All your courses and notes will be deleted forever.
+    </p>
+
+    <form method="post" action="{% url 'notes:delete_account' %}">
+        {% csrf_token %}
+
+        <button type="submit" class="delete-btn">
+            Yes, Delete My Account
+        </button>
+    </form>
+
+    <a href="{% url 'notes:profile' %}" class="cancel-btn">
+        Cancel
+    </a>
+
+</div>
+
+</body>
+</html>

@@ -8,7 +8,7 @@
         <section class="toolbar">
             <div class="right">
                 <button type="button" class="new" id="newBtn">+ New</button>
-                <input size=50  type="text" class="search-box" placeholder="Search"/>
+                <input size=50  type="text" class="search-box" placeholder="&#x1F50D; Search"/>
             </div >
                 <p class="right2">Click on + New to add your course information and notes.</p>
                 <p class="right3"></p>
@@ -45,8 +45,8 @@
                     {% endif %}
 
                     <div class="card-actions">
-                        <button class="edit-btn"  onclick="editNote({{ note.id }},'{{ note.name|escapejs }}','{{ note.topic|escapejs }}')">&#9998;Edit</button>
-                        <button class="delete-btn"  onclick="deleteNote({{ note.id }})">️&#10008;Delete</button>
+                        <button class="edit-btn"  onclick="editNote({{ note.id }},'{{ note.name|escapejs }}','{{ note.topic|escapejs }}')">&#9998; Edit</button>
+                        <button class="delete-btn"  onclick="deleteNote({{ note.id }})">️&#10008; Delete</button>
                     </div>
                 </div>
             </div>    
@@ -55,7 +55,7 @@
         <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
 <script>
 const isAuthenticated =
-    {% if request.user.is_authenticated %}true{% else %}false{%endif %};    
+    {% if request.user.is_authenticated %}true{% else %}false{%endif %};
 
 const newBtn = document.getElementById("newBtn");
 const noteModal = document.getElementById("noteModal");
@@ -106,21 +106,19 @@ window.addEventListener("click", function (event) {
 
 saveBtn.addEventListener("click", function () {
 
-    const Course Name = document.getElementById("courseName").value;
-    const noteName = document.getElementById("noteName").value;
+    const courseName = document.getElementById("courseName").value;
     const topic = document.getElementById("courseNote").value;
     const files = document.getElementById("courseFiles").files;
-    const courseId = document.getElementById("courseId").value;
 
-    if(name.trim() === "" || topic.trim() === ""){
+    if(courseName.trim() === "" || topic.trim() === ""){
         alert("Please enter course name and note.");
         return;
     }
 
     const formData = new FormData();
 
-    formData.append("course_name", courseName);
-    formData.append("name", noteName);
+    formData.append("course_name", courseName );
+    formData.append("name", courseName);
     formData.append("topic", topic);
 
     for(let i = 0; i < files.length; i++){
@@ -129,7 +127,7 @@ saveBtn.addEventListener("click", function () {
 
     let url;
 
-    if(editingId !== null){url = "{% url 'notes:create_note' %}";}
+    if(editingId === null){url = "{% url 'notes:create_note' %}";}
     else{url = `/update-note/${editingId}/`;}
     
     if(editingId !== null){
@@ -187,12 +185,12 @@ saveBtn.addEventListener("click", function () {
                                     '${data.name}',
                                     '${data.topic}'
                                 )">
-                            Edit
+                            &#9998;Edit
                         </button>
 
                         <button class="delete-btn"
                                 onclick="deleteNote(${data.id})">
-                            Delete
+                            ️&#10008;Delete
                         </button>
 
                     </div>
@@ -204,7 +202,77 @@ saveBtn.addEventListener("click", function () {
         const notesContainer =
             document.querySelector(".notes-container");
 
+        const coursesList = document.getElementById("coursesList");
+
         if(editingId === null){
+
+            let notesList =
+                document.getElementById(
+                    `notes-list-${data.course_id}`
+                );
+
+            // اگر کورس هنوز در سایدبار وجود ندارد
+            if(!notesList){
+
+                const sidebarBody =
+                    document.querySelector(".sidebar-body");
+
+                sidebarBody.innerHTML += `
+                    <div class="course"
+                        id="course-${data.course_id}">
+
+                        <div class="course-title">
+                            <span class="arrow">&#9656;</span>
+                            ${data.course_name}
+                        </div>
+
+                        <div class="notes-list"
+                            id="notes-list-${data.course_id}">
+                        </div>
+
+                    </div>
+                `;
+
+                notesList =
+                    document.getElementById(
+                        `notes-list-${data.course_id}`
+                    );
+            }
+
+            let sidebarFilesHtml = "";
+
+            if(data.files && data.files.length > 0){
+
+                data.files.forEach(function(file){
+
+                    sidebarFilesHtml += `
+                        <div class="sidebar-file">
+                            📄 ${file.name}
+                        </div>
+                    `;
+                });
+            }
+
+            notesList.innerHTML += `
+                <div class="sidebar-note-wrapper">
+
+                    <div class="note-item"
+                        id="sidebar-note-${data.id}"
+                        onclick="goToNote(${data.id})">
+
+                        &#9113; ${data.name}
+
+                    </div>
+
+                    <div class="sidebar-files"
+                        id="sidebar-files-${data.id}">
+
+                        ${sidebarFilesHtml}
+
+                    </div>
+
+                </div>
+            `;
             notesContainer.innerHTML += cardHtml;
         }
         else{
@@ -256,16 +324,42 @@ function deleteNote(id){
     .then(data => {
 
         if(data.success){
-            document.getElementById(
-                `note-${id}`
-            ).remove();
-        }
 
+            const card = document.getElementById(`note-${id}`);
+            if(card){
+                card.remove();
+            }
+
+            const sidebarNote =
+                document.getElementById(`sidebar-note-${id}`);
+
+            if(sidebarNote){
+                sidebarNote.remove();
+            }
+
+            const notesList =
+                document.getElementById(
+                    `notes-list-${data.course_id}`
+                );
+
+            if(
+                notesList &&
+                notesList.querySelectorAll(".note-item").length === 0
+            ){
+                const course =
+                    document.getElementById(
+                        `course-${data.course_id}`
+                    );
+
+                if(course){
+                    course.remove();
+                }
+            }
+        }
     })
     .catch(error => {
         console.log(error);
     });
 }
-
 </script>
 {% endblock %}

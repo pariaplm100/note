@@ -6,7 +6,7 @@
 
 body{
     font-family: Arial, sans-serif;
-    background: #f3f4f6;
+    background:linear-gradient(9deg,#999a9a,#5d85a7e3);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -63,61 +63,165 @@ body{
 
 .btn:hover{
     background: #2eaadc;
+    transform: translateY(-0.1rem);
+    font-size:19px;
 }
 
 .btn1{
     width: 100%;
-    padding: 12px;
+    padding: 11px;
     margin-top: 15px;
     border: none;
     border-radius: 10px;
     color: black;
-    font-size: 18px;
+    font-size: 16px;
     cursor: pointer;
     transition: 0.3s;
-    background-color: rgb(243, 36, 36);
+    background-color: #e53935;
     box-shadow: 0 5px 5px rgba(47, 46, 46, 0.669);
+    font-weight:500;
 }
 .btn1:hover{
     background: #850b00; 
     color: white;
+    transform: translateY(-0.1rem);
+    font-size:17px;
  }
  
- .back-btn{
-    position: fixed;
-    top: 8px;
-    left: 8px;
+.delete-account {
+    text-decoration:none;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    border:none;
+    
+}
 
-    width: 35px;
-    height: 35px;
+.delete-account-button{
+    display:flex;
+    border: none;
+    position:relative;
+    top:15px;
+    justify-content:center;
+    align-items:center;
+    background-color:#e53935;
+    text-decoration:none;
+    padding:14px 114px;
+    width:auto;
+    border-radius:10px;
+    font-weight:bold;
+    font-size:13.3px;
+    box-shadow: 0 5px 5px rgba(47, 46, 46, 0.669);
+    white-space: nowrap;
+}
+
+.delete-account-button:hover{
+    background: #850b00; 
+    color: white;
+    transform: translateY(-0.1rem);
+    font-size:14px;
+ }
+ 
+ .message{
+    padding:10px;
+    margin:10px 0;
+    border-radius:6px;
+    text-align:center;
+    font-size:14px;
+}
+
+.message.error{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position: relative;
+    top:-300px;
+    background:#ffdddd;
+    color:#b30000;
+    border:1px solid #ff6666;
+    
+}
+
+.message.success{
+    background:#ddffdd;
+    color:#006600;
+    border:1px solid #66cc66;
+}
+
+#toast-container{
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
 
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
+    gap: 10px;
 
-    background: #90c8f36b;
-    color: black;
-
-    text-decoration: none;
-    font-size: 28.5px;
-    font-weight: bold;
-
-    border-radius: 14px;
-    box-shadow: 0 8px 20px rgba(0,0,0,.50);
-
-    transition: all .25s ease;
-    z-index: 1000;
+    pointer-events: none;
 }
 
-.back-btn span{
-    position: relative;
-    top: -4.5px; 
+.toast{
+    min-width: 260px;
+    max-width: 350px;
+
+    padding: 14px 18px;
+    border-radius: 10px;
+
+    color: white;
+    font-size: 15px;
+
+    box-shadow: 0 8px 20px rgba(0,0,0,.25);
+
+    opacity: 1;
+    transition: opacity .5s ease, transform .5s ease;
+
+    transform: translateX(0);
 }
 
-.back-btn:hover{
-    background: #0a58ca;
-    transform: translateY(-2px);
-    box-shadow: 0 50px 50px rgba(0,0,0,.35);
+.toast.success{
+    background: #2ecc71;
 }
 
-    
+.toast.error{
+    background: #e74c3c;
+}
+
+.toast.warning{
+    background: #f39c12;
+}
+
+.toast.info{
+    background: #3498db;
+}
+
+.menu-btn{
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 10px;
+}
+
+ 
+.back_btn{
+    display:flex;
+    align-items:center;
+    justify-content:left;
+    position:relative;
+    text-decoration:none;
+    width:16%;
+    top:-25px;
+    left:-16px;
+    color:#fff;
+    padding:8px;
+    border-radius:10px;
+    background-color:gray;
+    font-size:10px
+    font-weight:bold;
+}
+
+.back_btn:hover{
+    transform: translateY(-0.1rem);
+    font-size:15px;
+}

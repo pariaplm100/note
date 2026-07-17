@@ -1,0 +1,106 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Profile</title>
+
+    <link rel="stylesheet" href="{% static 'edit_profile.css' %}">
+
+</head>
+<body>
+
+{% if messages %}
+<div id="toast-container">
+    {% for message in messages %}
+        <div class="toast {{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+        
+<div class="container">
+    <a href="{% url 'notes:profile' %}" class='back-btn1'> Back </a>
+
+    <div class="profile-card">
+
+        <h2>Edit Profile</h2>
+        
+        
+        <form method="POST" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <label class="image-label" for="image">
+
+                {% if profile.image %}
+                    <img src="{{ profile.image.url }}" id="preview" class="profile-image">
+                {% else %}
+                    <img src="https://rasanika.com/storage/i/17263/11XRGPqMYoSnic0zJ1uVJcl2/orig-900/image--rasanika.com.webp"
+                         id="preview"
+                         class="profile-image">
+                {% endif %}
+
+                <div class="camera-icon"> 📷 </div>
+
+            </label>
+
+            <input type="file" name="image" id="image" accept="image/*" hidden>
+
+            <div class="form-group">
+                
+                <label>Username</label>
+
+                <input type="text" name="username" value="{{request.user.username }}" required>
+
+            </div>
+
+            <div class="form-group">
+                <label>Bio</label>
+
+                <textarea
+                    name="bio"
+                    placeholder="Write something about yourself...">{{ profile.bio }}</textarea>
+
+            </div>
+
+            <button type="submit" class="save-btn">Save Changes</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+setTimeout(() => {
+            document.querySelectorAll(".toast").forEach(msg => {
+                msg.style.opacity = "0";
+                msg.style.transform = "translateX(100px)";
+                setTimeout(() => {msg.remove();}, 300);
+            });
+        }, 2500);
+
+const input = document.getElementById("image");
+const preview = document.getElementById("preview");
+
+input.onchange = function(){
+    const file = this.files[0];
+    if(file){
+        preview.src = URL.createObjectURL(file);
+        
+    }
+}
+
+</script>
+
+</body>
+
+</html>
