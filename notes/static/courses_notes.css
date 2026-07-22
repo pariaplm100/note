@@ -1,0 +1,190 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial, sans-serif;
+    background:linear-gradient(135deg,#8db8e8,#d7ecff);
+    min-height:100vh;
+}
+
+.container{
+    width:90%;
+    max-width:1000px;
+    margin:40px auto;
+}
+
+.title{
+    text-align:center;
+    color:#fff;
+    margin-bottom:30px;
+    font-size:38px;
+    text-shadow:0 2px 8px rgba(0,0,0,.2);
+}
+
+.search-box{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:30px;
+}
+
+.search-box input{
+    width:400px;
+    padding:12px 18px;
+    border:none;
+    border-radius:12px;
+    outline:none;
+    font-size:16px;
+}
+
+.search-box button{
+    background:#3563b7;
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    padding:12px 24px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.search-box button:hover{
+    background:#234b96;
+}
+
+.add-new-course{
+    position: relative;
+    right: -893px;
+    top: 32px;
+    
+}
+
+.add-btn{
+    text-decoration: none;
+    background:#3563b7;
+    color: #fff;
+    padding: 14px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+}
+
+.add-btn:hover{
+    background:#234b96;
+}
+
+.note-card{
+    background:#fff;
+    border-radius:20px;
+    padding:25px;
+    margin-bottom:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+    transition:.3s;
+}
+
+.note-card:hover{
+    transform:translateY(-5px);
+}
+
+.card-link{
+    text-decoration:none;
+    color:inherit;
+    display:block;
+}
+
+.card-link h3{
+    color:#3563b7;
+    font-size:24px;
+    margin-bottom:12px;
+}
+
+.card-link p{
+    color:#555;
+    line-height:1.7;
+    font-size:16px;
+}
+
+.card-footer{
+    margin-top:20px;
+    padding-top:18px;
+    border-top:1px solid #ddd;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.files-count{
+    color:#777;
+    font-size:14px;
+}
+
+.actions{
+    display:flex;
+    gap:12px;
+}
+
+.edit-btn,
+.delete-btn{
+    text-decoration:none;
+    border:none;
+    padding:10px 20px;
+    border-radius:10px;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.3s;
+    font-size:14px;
+}
+
+.edit-btn{
+    background:#4CAF50;
+}
+
+.edit-btn:hover{
+    background:#3d9442;
+}
+
+.delete-btn{
+    background:#f44336;
+}
+
+.delete-btn:hover{
+    background:#d62d20;
+}
+
+.pagination{
+    margin-top:35px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+}
+
+.pagination a{
+    text-decoration:none;
+    background:#3563b7;
+    color:white;
+    padding:10px 18px;
+    border-radius:10px;
+    transition:.3s;
+}
+
+.pagination a:hover{
+    background:#234b96;
+}
+
+.pagination span{
+    color:white;
+    font-weight:bold;
+    font-size:16px;
+}
+
+.empty{
+    text-align:center;
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    font-size:18px;
+    color:#666;
+}

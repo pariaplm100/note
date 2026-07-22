@@ -1,0 +1,411 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'home.css' %}">
+{% endblock %}
+{% block content %}
+        <section class="toolbar">
+            <div class="right">
+                <button type="button" class="new" id="newBtn">+ New</button>
+                <input size=50  type="text" class="search-box" placeholder="&#x1F50D; Search"/>
+            </div >
+                <p class="right2">Click on + New to add your course information and notes.</p>
+                <p class="right3"></p>
+                
+        </section>
+        <div id="noteModal" class="modal">
+            <div class="modal-content">
+                <p>Course Card</p>
+                <span class="close-btn" id="closeBtn">&times;</span>
+                <input type="text" id="courseName" placeholder="Course Name">
+                
+                
+                <textarea id="courseNote" placeholder="Write your note..."></textarea>
+                <input type="file" id="courseFiles" multiple>               
+                <button id="saveBtn">Save</button>
+            </div>    
+        </div>
+        <div class="notes-container">
+            {% for note in notes %}
+            <div class="note-card" id="note-{{ note.id }}">
+                <div class="card-header">
+                    <h2>{{ note.name }}</h2>
+                </div>
+
+                <div class="card-body">
+                    <p>{{ note.topic }}</p>
+                    {% if note.files.all %}
+                    <div class="files-section">
+                        <h4>Files:</h4>
+                        {% for file in note.files.all %}
+                            <div class="file-item" id="file-{{ file.id }}">
+                                <a href="{{ file.file.url }}" target="_blank">{{ file.file.name|cut:"notes_files/" }}</a>
+                                <button  type="button" class="delete-file"  onclick="deleteFile({{ file.id }})"> &times;</button>
+                            </div>
+
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="card-actions">
+                        <button class="edit-btn"  onclick="editNote({{ note.id }},'{{ note.name|escapejs }}','{{ note.topic|escapejs }}')">&#9998; Edit</button>
+                        <button class="delete-btn"  onclick="deleteNote({{ note.id }})">️&#10008; Delete</button>
+                    </div>
+                </div>
+            </div>    
+            {% endfor %}    
+        </div>
+        <input type="hidden" id="csrfToken" value="{{ csrf_token }}">
+<script>
+
+const isAuthenticated =
+    {% if request.user.is_authenticated %}true{% else %}false{%endif %};
+
+const newBtn = document.getElementById("newBtn");
+const noteModal = document.getElementById("noteModal");
+const closeBtn = document.getElementById("closeBtn");
+const saveBtn = document.getElementById("saveBtn");
+
+let editingId = null;
+
+
+
+newBtn.addEventListener("click", function () {
+
+    if (!isAuthenticated) {
+        window.location.href = "{% url 'accounts:login_page' %}";
+        return;
+    }
+
+    editingId = null;
+
+    document.getElementById("courseName").value = "";
+    document.getElementById("courseNote").value = "";
+    document.getElementById("courseFiles").value = "";
+
+    noteModal.style.display = "flex";
+});
+
+
+closeBtn.addEventListener("click", function () {
+
+    noteModal.style.display = "none";
+
+    document.getElementById("courseName").value = "";
+    document.getElementById("courseNote").value = "";
+    document.getElementById("courseFiles").value = "";
+
+    editingId = null;
+});
+
+
+
+window.addEventListener("click", function (event) {
+    if (event.target === noteModal) {
+        noteModal.style.display = "none";
+    }
+});
+
+
+
+saveBtn.addEventListener("click", function () {
+
+    const courseName = document.getElementById("courseName").value;
+    const topic = document.getElementById("courseNote").value;
+    const files = document.getElementById("courseFiles").files;
+
+    if(courseName.trim() === "" || topic.trim() === ""){
+        alert("Please enter course name and note.");
+        return;
+    }
+
+    const formData = new FormData();
+
+    formData.append("course_name", courseName );
+    formData.append("name", courseName);
+    formData.append("topic", topic);
+
+    for(let i = 0; i < files.length; i++){
+        formData.append("files", files[i]);
+    }
+
+    let url;
+
+    if(editingId === null){url = "{% url 'notes:create_note' %}";}
+    else{url = `/update-note/${editingId}/`;}
+    
+    if(editingId !== null){
+        url = `/update-note/${editingId}/`;
+    }
+
+    fetch(url,{
+        method:"POST",
+        headers:{
+            "X-CSRFToken":
+                document.getElementById("csrfToken").value
+        },
+        body:formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+
+        let filesHtml = "";
+
+
+        let filesHtml = "";
+
+        if(data.files && data.files.length > 0){
+
+            filesHtml += `
+                <div class="files-section">
+                    <h4>Files:</h4>
+            `;
+
+            data.files.forEach(function(file){
+                filesHtml += `
+
+                    <div class="file-item" id="file-${file.id}">
+
+                        <a href="${file.url}" target="_blank">
+                        ${file.name}
+                        </a><br>
+
+                        <button type="button"   class="delete-file"    onclick="deleteFile(${file.id})"> &times; </button>
+
+                    </div>
+                `;
+            });
+
+            filesHtml += `</div>`;
+        }
+
+        const cardHtml = `
+            <div class="note-card" id="note-${data.id}">
+                <div class="card-header">
+                    <h2>${data.name}</h2>
+                </div>
+
+                <div class="card-body">
+
+                    <p>${data.topic}</p>
+
+                    ${filesHtml}
+
+                    <div class="card-actions">
+
+                        <button class="edit-btn" onclick="editNote( ${data.id}, '${data.name}', '${data.topic}' )">
+                            &#9998;Edit
+                        </button>
+
+                        <button class="delete-btn"
+                                onclick="deleteNote(${data.id})">
+                            ️&#10008;Delete
+                        </button>
+
+                    </div>
+
+                </div>
+            </div>
+        `;
+
+        const notesContainer =
+            document.querySelector(".notes-container"); //class = "notes_container"
+
+        const coursesList = document.getElementById("coursesList"); //id = "courseList"
+
+        if(editingId === null){
+
+            let notesList =
+                document.getElementById(
+                    `notes-list-${data.course_id}`
+                );
+
+            // اگر کورس هنوز در سایدبار وجود ندارد
+            if(!notesList){
+
+                const sidebarBody =
+                    document.querySelector(".sidebar-body");
+
+                sidebarBody.innerHTML += `
+                    <div class="course"
+                        id="course-${data.course_id}">
+
+                        <div class="course-title">
+                            <span class="arrow">&#9656;</span>
+                            ${data.course_name}
+                        </div>
+
+                        <div class="notes-list"
+                            id="notes-list-${data.course_id}">
+                        </div>
+
+                    </div>
+                `;
+
+                notesList =
+                    document.getElementById(
+                        `notes-list-${data.course_id}`
+                    );
+            }
+
+            let sidebarFilesHtml = "";
+
+            if(data.files && data.files.length > 0){
+
+                data.files.forEach(function(file){
+
+                    sidebarFilesHtml += `
+                        <div class="sidebar-file" id="sidebar-file-${file.id}">
+                            📄 ${file.name}
+                        </div>
+                    `;
+                });
+            }
+
+            notesList.innerHTML += `
+                <div class="sidebar-note-wrapper">
+
+                    <div class="note-item"
+                        id="sidebar-note-${data.id}"
+                        onclick="goToNote(${data.id})">
+
+                        &#9113; ${data.name}
+
+                    </div>
+
+                    <div class="sidebar-files"
+                        id="sidebar-files-${data.id}">
+
+                        ${sidebarFilesHtml}
+
+                    </div>
+
+                </div>
+            `;
+            notesContainer.innerHTML += cardHtml;
+        }
+        else{
+            document.getElementById(
+                `note-${editingId}`
+            ).outerHTML = cardHtml;
+        }
+
+        document.getElementById("courseName").value = "";
+        document.getElementById("courseNote").value = "";
+        document.getElementById("courseFiles").value = "";
+        document.getElementById("popupFiles").innerHTML = "";
+
+
+        noteModal.style.display = "none";
+
+        editingId = null; //حالت ویرایش تموم میشه
+    })
+    .catch(error => {  //برای هندل کردن ارور و نمایش آن
+        console.log(error);
+    });
+});
+
+function deleteFile(fileId){
+    if(!confirm("Delete this file?")){
+        return;
+    }
+
+    fetch(`/delete-file/${fileId}/`,{
+        method:"POST",
+        headers:{
+            "X-CSRFToken":
+            document.getElementById("csrfToken").value
+        }
+    })
+    .then(r=>r.json())
+    .then(data=>{
+
+        if(data.success){
+            document.getElementById( `file-${fileId}`  )
+            ?.remove();
+            document.getElementById(  `sidebar-file-${fileId}` )
+            ?.remove();
+        }
+
+    });
+
+}
+
+function editNote(id,name,topic){
+
+    editingId = id;
+
+    document.getElementById("courseName").value = name;
+    document.getElementById("courseNote").value = topic;
+
+    fetch(`/note-files/${id}/`)
+    .then(response => response.json())
+    .then(data => {
+
+        let html = "";
+
+        data.files.forEach(function(file){
+
+            html += `
+                <div class="file-item" id="file-${file.id}">
+                    <a href="${file.url}" target="_blank">  ${file.name}  </a>
+                    <button  class="delete-file"   onclick="deleteFile(${file.id})">  &times; </button>
+                </div>
+            `;
+
+        });
+
+        document.getElementById("popupFiles").innerHTML = html;
+
+    });
+    noteModal.style.display = "flex";
+}
+
+
+function deleteNote(id){
+
+    if(!confirm("Delete this note?")){
+        return;
+    }
+
+    fetch(`/delete-note/${id}/`,{
+        method:"POST",
+        headers:{
+            "X-CSRFToken":
+                document.getElementById("csrfToken").value
+        }
+    })
+    .then(response => response.json())   //json ارسال پاسخ به 
+    .then(data => {
+
+        if(data.success){
+
+            const card = document.getElementById(`note-${id}`);
+            if(card){
+                card.remove();
+            }
+
+            const sidebarNote =  document.getElementById(`sidebar-note-${id}`);
+            if(sidebarNote){
+                sidebarNote.remove();
+            }
+
+            if (data.course_deleted) {  //؟
+
+                const course = document.getElementById( `course-${data.course_id}`  );
+                if (course) {
+                    course.remove();
+                }
+            }
+        }
+    })
+    .catch(error => {
+        console.log(error);
+    });
+}
+
+
+
+</script>
+{% endblock %}

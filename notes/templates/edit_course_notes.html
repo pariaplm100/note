@@ -1,0 +1,115 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Note</title>
+
+    <link rel="stylesheet" href="{% static 'edit_course_notes.css' %}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1 class="title">
+        Edit Course & Note
+    </h1>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        <label>Course Name</label>
+
+        <input
+            type="text"
+            name="name"
+            class="text-input"
+            value="{{ note.name }}"
+            required>
+
+
+        <label>Note</label>
+
+        <textarea
+            name="topic"
+            class="text-area"
+            required>{{ note.topic }}</textarea>
+
+
+        <h3 class="files-title">
+            Uploaded Files
+        </h3>
+
+        <div class="files-list">
+
+            {% for file in note.files.all %}
+
+                <div class="file-item">
+
+                    <span>
+                        📄 {{ file.file.name|cut:"notes_files/" }}
+                    </span>
+
+                    <a href="{% url 'notes:delete_file' file.id %}" class="delete-file" 
+                    onclick="return confirm('Are you Sure you want to delete this file?' );" >
+
+                        Delete
+
+                    </a>
+
+                </div>
+
+            {% empty %}
+
+                <p class="empty">
+                    No uploaded files.
+                </p>
+
+            {% endfor %}
+
+        </div>
+
+
+        <label>Add New Files</label>
+
+        <input
+            type="file"
+            name="files"
+            multiple>
+
+
+        <div class="buttons">
+
+            <a
+                href="{% url 'notes:Course_Notes' %}"
+                class="cancel-btn">
+
+                Cancel
+
+            </a>
+
+
+            <button
+                type="submit"
+                class="save-btn">
+
+                Save Changes
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,133 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial, sans-serif;
+    background:linear-gradient(135deg,#8db8e8,#d7ecff);
+    min-height:100vh;
+}
+
+.container{
+    width:90%;
+    max-width:800px;
+    margin:50px auto;
+    background:#fff;
+    border-radius:20px;
+    padding:35px;
+    box-shadow:0 12px 30px rgba(0,0,0,.18);
+}
+
+.title{
+    text-align:center;
+    color:#3563b7;
+    margin-bottom:30px;
+    font-size:32px;
+}
+
+label{
+    display:block;
+    margin-top:20px;
+    margin-bottom:8px;
+    color:#3563b7;
+    font-size:17px;
+    font-weight:bold;
+}
+
+.text-input{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:#eef5ff;
+    font-size:16px;
+    outline:none;
+    transition:.3s;
+}
+
+.text-input:focus{
+    background:#e2eeff;
+    box-shadow:0 0 8px rgba(53,99,183,.3);
+}
+
+.text-area{
+    width:100%;
+    height:220px;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:#eef5ff;
+    resize:vertical;
+    font-size:16px;
+    outline:none;
+    transition:.3s;
+}
+
+.text-area:focus{
+    background:#e2eeff;
+    box-shadow:0 0 8px rgba(53,99,183,.3);
+}
+
+input[type=file]{
+    margin-top:15px;
+    width:100%;
+    padding:12px;
+    border-radius:12px;
+    background:#eef5ff;
+    cursor:pointer;
+}
+
+.buttons{
+    margin-top:35px;
+    display:flex;
+    justify-content:flex-end;
+    gap:15px;
+}
+
+.cancel-btn{
+    text-decoration:none;
+    background:#9e9e9e;
+    color:#fff;
+    padding:12px 28px;
+    border-radius:12px;
+    transition:.25s;
+}
+
+.cancel-btn:hover{
+    background:#757575;
+}
+
+.save-btn{
+    border:none;
+    background:#4caf50;
+    color:white;
+    padding:12px 28px;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:16px;
+    transition:.25s;
+}
+
+.save-btn:hover{
+    background:#3d9140;
+}
+
+@media(max-width:700px){
+
+    .container{
+        width:95%;
+        padding:25px;
+    }
+
+    .buttons{
+        flex-direction:column;
+    }
+
+    .cancel-btn,
+    .save-btn{
+        width:100%;
+        text-align:center;
+    }
+}

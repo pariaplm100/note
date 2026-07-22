@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'contact-us.css' %}">
+{% endblock %}
+
+{% block content %}
+    
+    <a href="javascript:history.back()" class="back-btn">
+        <span>←</span>
+    </a>
+    
+    <div class="liner-continer">
+		<h4 class="continer">Contact Us</h4> 
+	</div>
+    <div class="title-continer">
+		<p>If you have any questions,suggestions for site improvement, please feel free to reach out to us.</p>
+    </div>
+    <div class="elementor-text-contact-information">
+        <span class="text-contact-information">Contact Information</span>
+    </div>
+	
+    <div class="icon-box-email">
+        <h3 class="icon-box-email-h3"><a class='a2' href="mailto:apdevs12@gmail.com">apdevs12@gmail.com</a></h3>
+        <p class="icon-box-email-p">Connect with us by Email</p>
+        <p class="icon-box-email-p2">Tab On it &#8679;</p>
+    </div> 
+    <div class="icon-box-hour">
+		<h3 class="icon-box-hour-h3-h"><a href="" >7 AM – 12 PM</a></h3>
+        <p class="icon-box-hour-p">Service Hours</p>
+	</div>   
+    <form action="{% url 'notes:ContactUs' %}" method="post">
+        {% csrf_token %}
+        <div class="contact-us">
+            {% if not request.user.is_authenticated %}
+            <div class="f-l name">
+                <label for="form-Username">Username:</label>
+                <input  type="text" name="username" id="form-Username" placeholder="Username">
+            </div>
+            <div class="email">
+                <label for="form-email">Email :</label>
+                <input type="email" name="email" id="form-email" placeholder="example@gmail.com">
+            </div>
+            <div class="phone_number">
+                <label for="form-number">Phone Number :</label>
+                <input type="tel" name="phone_number" id="form-number" placeholder="phone number">
+            {% else %}    
+            <div class="f-2">
+                <label for="form-Username">Username:</label>
+                <input  class='auto-fill' type="text" value="{{request.user.username}}" name="username" id="form-Username" placeholder="Username">
+            </div>
+            <div class="email-2">
+                <label for="form-email">Email :</label>
+                <input class='auto-fill' type="email" value="{{request.user.email}}" name="email" id="form-email" placeholder="example@gmail.com">
+            </div>
+            <div class="phone_number">
+                <label for="form-number">Phone Number :</label>
+                <input class='auto-fill' type="tel" value="{{request.user.profile.phone_number}}" name="telephonenumber" id="form-number" placeholder="phone number">
+            
+            {% endif %}    
+            </div>
+            <div class="message-text">
+                <label for="form-field-message">Message :</label>
+                <textarea name="message" id="form-field-message" placeholder="Say Somethings...." rows="4"></textarea>
+            </div>
+            <div class="send-text">
+    			<button class="send-text" type="submit">
+                    <span class="send-text">Send</span>
+			</button>
+		</div>
+	</form>	
+    </div>
+    <script>
+        document.querySelectorAll(".auto-fill").forEach(input => {
+        input.addEventListener("input", function() {
+            this.style.backgroundColor = "white";
+        });
+    });
+    </script>
+{% endblock %}

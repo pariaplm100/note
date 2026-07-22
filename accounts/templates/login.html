@@ -1,0 +1,131 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head >
+    <link rel="stylesheet" href="{% static 'login.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in/Sign up</title>
+</head>
+<body>
+{% if messages %}
+<div id="toast-container">
+    {% for message in messages %}
+        <div class="toast {{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="container">
+    
+    <div class="title">User Account</div>
+    <div class="toggle">
+        <button id="loginBtn" class="active" onclick="showLogin()">Login</button>
+        <button id="registerBtn" onclick="showRegister()">Sign up</button>
+    </div>
+    
+    
+    <form method="POST" action="{% url 'accounts:login' %}" id="loginForm" class="form active">
+        {% csrf_token %}
+
+
+        <input type="text" name="username" placeholder="Username" value="{{username}}" class="{% if username_error %}input-error{% endif %}">
+    <div class='password-row'>    
+        <input type='password' id='id_password3' name='password' placeholder='Password' class="{% if password_error %} input-error{% endif %}" required>
+        <button type='button' class='show-password-button2' onclick="const inp = document.getElementById('id_password3'); inp.type = inp.type === 'password' ? 'text': 'password'; this.textContent = inp.type === 'password' ? 'Show': 'Hide'; ">Show</button>
+    </div>            
+       
+        {% if username_error %}
+        <div class="error-box">{{ username_error }}</div>
+        {% endif %}
+
+        
+        {% if password_error %}
+        <div class="error-box">{{ password_error }}</div>
+        {% endif %}
+
+        <div class="captcha">
+            <div class="captcha-box">{{captcha1}}</div>
+            <input type="text" name="captcha" placeholder="Captcha">
+
+        </div>
+        {% if captcha_error %}
+            <div class="error-box">{{ captcha_error }}</div>   
+        {% endif %}
+
+        <button class="btn" type="submit">Login to account</button>
+        <div class="forgot-password">
+            <a href="{% url 'accounts:forgot_password' %}">Forgot Password ? </a>
+        </div>
+    </form>
+    
+    <form method="POST" action="{% url 'accounts:signup' %}" id="registerForm" class="form">
+        {% csrf_token %}
+        
+
+        <input type="text" name="username" value="{{ signup_username }}" placeholder="Username" required>
+        
+        <input type="text" name="phone_number" value="{{ signup_phone }}" placeholder="Phone Number" required>
+        
+        <input type="email" name="email" value="{{ signup_email }}" placeholder="Email" required>
+        
+    <div class='password-row'>    
+        <input type='password' id='id_password1' name='password1' placeholder='Password' class="{% if password_error %} input-error{% endif %}" required>
+        <button type='button' class='show-password-button2' onclick="const inp = document.getElementById('id_password1'); inp.type = inp.type === 'password' ? 'text': 'password'; this.textContent = inp.type === 'password' ? 'Show': 'Hide'; ">Show</button>
+    </div>            
+    
+    <div class='password-row'>
+        <input type="password" id='id_password2' name="password2" placeholder="Confirm Password" class="{% if password_error %} input-error{% endif %}" required> 
+        <button type="button" class="show-password-button2" onclick="const inp= document.getElementById('id_password2');inp.type = inp.type === 'password' ? 'text': 'password'; this.textContent = inp.type === 'password' ?'Show': 'Hide';">Show</button>
+    </div>    
+
+        <div class="captcha">
+            <div class="captcha-box">{{captcha2}}</div>
+            <input type="text" name="captcha" placeholder="Captcha">
+        </div>
+            <button class="btn" type="submit">Sign Up</button>
+    </form>
+
+</div>
+
+<script>
+window.onload = function () {
+    {% if show_login %}
+        localStorage.setItem("activeForm", "login");
+    {% endif %}
+    const activeForm = localStorage.getItem("activeForm");
+    if (activeForm === "register") {
+        showRegister();
+    } else {
+        showLogin();
+    }
+}
+    
+    
+setTimeout(() => {
+    document.querySelectorAll(".toast").forEach(msg => {
+        msg.style.opacity = "0";
+        msg.style.transform = "translateX(100px)";
+        setTimeout(() => {msg.remove();}, 500);
+    });
+}, 3000);
+
+
+function showLogin(){    
+    document.getElementById("loginForm").classList.add("active");    
+    document.getElementById("registerForm").classList.remove("active");
+    document.getElementById("loginBtn").classList.add("active");    
+    document.getElementById("registerBtn").classList.remove("active");
+    localStorage.setItem("activeForm", "login");}
+function showRegister(){    document.getElementById("registerForm").classList.add("active");    
+    document.getElementById("loginForm").classList.remove("active");
+    document.getElementById("registerBtn").classList.add("active");    
+    document.getElementById("loginBtn").classList.remove("active");
+    localStorage.setItem("activeForm", "register");
+}
+</script>
+
+</body>
+</html>

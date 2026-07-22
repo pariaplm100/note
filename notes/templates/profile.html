@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="{% static 'profile.css' %}">
+</head>
+<body>
+    {% if messages %}
+    <div id="toast-container">
+        {% for message in messages %}
+            <div class="toast {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>    
+    {% endif %}
+    
+    <div>
+        <div class="contaner">
+            <div class="profile">
+
+                <a href="{% url 'notes:home' %}" class='back_btn'> <span class="back-btn2"> Back </span> </a>
+                
+                {% if profile.image %}
+                    <div class="image1"><img src="{{ profile.image.url }}" alt="profile"></div>
+                    
+                        <a href="{% url 'notes:Course_Notes' %}"><button class="btn" >Courses and Notes</button></a>
+                        
+                        <a href="{% url 'notes:edit_profile' %}"><button class="btn" >Edit Profile | complete</button></a>
+                        
+                        <a href="{% url 'notes:view_profile' %}"><button class="btn" >View Profile</button></a>
+                        
+                        <a href="{% url 'accounts:logout' %}" class="logout"><button class="btn1">LOG OUT</button></a>
+                        
+                        <a href="{% url 'notes:confirm_delete_account' %}" class=delete-account><button class='delete-account-button'>Delete Account </button></a>
+
+                {% else %}
+                    <div class="image2"><img src="https://rasanika.com/storage/i/17263/11XRGPqMYoSnic0zJ1uVJcl2/orig-900/image--rasanika.com.webp" alt="profile"></div>
+
+                        <a href="{% url 'notes:Course_Notes' %}"><button class="btn" >Courses and Notes</button></a>
+                        
+                        <a href="{% url 'notes:edit_profile' %}"><button class="btn" >Edit Profile | complete</button></a>
+                        
+                        <a href="{% url 'notes:view_profile' %}"><button class="btn" >View Profile</button></a>
+                        
+                        <a href="{% url 'accounts:logout' %}" class="logout"><button class="btn1">LOG OUT</button></a>
+                        
+                        <a href="{% url 'notes:confirm_delete_account' %}" class=delete-account><button class='delete-account-button'>Delete Account </button></a>
+                {% endif %}    
+                
+            </div>
+        </div>
+    </div>
+    <script>    
+    setTimeout(() => {
+                document.querySelectorAll(".toast").forEach(msg => {
+                    msg.style.opacity = "0";
+                    msg.style.transform = "translateX(100px)";
+                    setTimeout(() => {msg.remove();}, 300);
+                });
+            }, 2500);    
+            
+    </script>        
+</body>
+</html>
