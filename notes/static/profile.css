@@ -29,13 +29,15 @@ body{
     box-shadow: 0 5px 20px rgba(0,0,0,0.1);
 }
 
-.image{
-    width: 130px;
-    height: 130px;
+.image1{
+    width: 180px;
+    height: 180px;
     margin: 0 auto 20px;
+    border-radius: 50%;
+    border:3.5px solid #4b90e2 ;
 }
 
-.image img{
+.image1 img{
     width: 100%;
     height: 100%;
     border-radius: 50%;
@@ -54,7 +56,8 @@ body{
     margin-top: 15px;
     border: none;
     border-radius: 10px;
-    color: black;
+    background:#4b90e2;
+    color:#fff;
     font-size: 18px;
     cursor: pointer;
     transition: 0.3s;
@@ -62,7 +65,7 @@ body{
 }
 
 .btn:hover{
-    background: #2eaadc;
+    background: #06aef1;
     transform: translateY(-0.1rem);
     font-size:19px;
 }
@@ -73,7 +76,7 @@ body{
     margin-top: 15px;
     border: none;
     border-radius: 10px;
-    color: black;
+    color: #fff;
     font-size: 16px;
     cursor: pointer;
     transition: 0.3s;
@@ -105,6 +108,7 @@ body{
     justify-content:center;
     align-items:center;
     background-color:#e53935;
+    color: #fff;
     text-decoration:none;
     padding:14px 114px;
     width:auto;
@@ -211,17 +215,24 @@ body{
     position:relative;
     text-decoration:none;
     width:16%;
-    top:-25px;
-    left:-16px;
+    top:-40px;
+    left:-30px;
     color:#fff;
     padding:8px;
-    border-radius:10px;
-    background-color:gray;
-    font-size:10px
-    font-weight:bold;
+    border-top-left-radius:12px;
+    border-bottom-right-radius:13px;
+    background:#4b90e2;
+    font-size:14px;
+    font-weight:520;
 }
 
 .back_btn:hover{
-    transform: translateY(-0.1rem);
-    font-size:15px;
+    background: #255289;
+    font-size:15px
+    
+}
+
+.back-btn2{
+    position: relative;
+    right: -2px;
 }

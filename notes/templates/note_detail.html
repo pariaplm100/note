@@ -1,0 +1,71 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Note Details </title>
+
+    <link rel="stylesheet" href="{% static 'note_detail.css' %}">
+</head>
+<body>
+
+<div class="container">
+
+    <h1 class="title">
+        {{ note.name }}
+    </h1>
+
+    <div class="section">
+
+        <h2>Description</h2>
+
+        <div class="note-text">
+            {{ note.topic|linebreaks }}
+        </div>
+
+    </div>
+
+    <div class="section">
+
+        <h2>Uploaded Files</h2>
+
+        {% if note.files.all %}
+
+            <div class="files">
+
+                {% for file in note.files.all %}
+
+                    <a href="{{ file.file.url }}" target="_blank" class="file-card">
+
+                        📄 {{ file.file.name|cut:"notes_files/" }}
+
+                    </a>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <p class="empty">
+                No files uploaded.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+    <div class="buttons">
+
+        <a href="{% url 'notes:edit_course_notes' note.id %}" class="edit-btn">
+            Edit Note
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

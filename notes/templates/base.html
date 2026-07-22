@@ -42,11 +42,14 @@
                                 <div class="note-item"  id="sidebar-note-{{ note.id }}"  onclick="goToNote({{ note.id }})">
                                     &#9113; {{ note.name }}
                                 </div>
+
                                 <div class="sidebar-files"  id="sidebar-files-{{ note.id }}">
 
                                     {% for file in note.files.all %}
-                                        <div class="sidebar-file">
-                                            📄 {{ file.file.name|cut:"notes_files/" }}
+                                        <div class="sidebar-file" id="sidebar-file-{{ file.id }}">
+                                            <a href="{{ file.file.url }}" target="_blank"> {{ file.file.name|cut:"notes_files/" }}</a>
+                                            <span class="delete-file"   onclick="deleteFile({{ file.id }})">&times;</span>
+
                                         </div>
                                     {% endfor %}
 
@@ -72,26 +75,40 @@
             <nav class="navbar">
                 
                 {% if not request.user.is_authenticated %}
+
                 <a href="{% url 'accounts:signup' %}" class="item-navbar">sing up | Login</a>
+
                 {% else %}
+
                 <p></p>
+
                 {% endif %}
                 
                 {% if request.user.is_authenticated %}
-                <a href="{% url 'notes:profile' %}" class="profile-link">
-                    <img src="https://rasanika.com/storage/i/17263/11XRGPqMYoSnic0zJ1uVJcl2/orig-900/image--rasanika.com.webp"
-                        alt="profile"
-                        class="profile_icon">
-                {% endif %}    
+                    <a href="{% url 'notes:profile' %}" class="profile-link">
+                        {% if request.user.profile.image %}
+                            <img src="{{ request.user.profile.image.url }}" alt="Profile" class="profile-image">
+                        {% else %}
+                            <img src="{% static 'images/default_profile.png.webp' %}"  class="profile-image2">
+
+                        {% endif %}
+                    </a>
+
+                    {% endif %}
+                    
                 
                 <a href="{% url 'notes:home' %}" class="item-navbar">Home</a>
-                 
                 <a href="{% url 'notes:AboutUs' %}" class="item-navbar">About us</a>
                 <a href="{% url 'notes:ContactUs' %}" class="item-navbar">Contact Us</a>
+                <a href="{% url 'notes:Course_Notes' %}" class="item-navbar">courses | notes</a>
+
             </nav>
             <h1 class="Noteorganizer">Note Organizer</h1>
         </header>
+        
         {% block content %}
+
+
 
         {% endblock  %}
     </div>

@@ -1,5 +1,5 @@
 body{
-    margin:0;
+    margin:-28px;
     font-family:sans-serif;
     background:linear-gradient(9deg,#999a9a,#5d85a7e3);
     display:flex;
@@ -105,32 +105,25 @@ body{
 }
 
 .back-btn{
-    position:fixed;
-    top:15px;
-    left:15px;
-    width:38px;
-    height:38px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:white;
-    color:black;
-    border-radius:12px;
+    position: relative;
+    left: 53px;
+    top: 0px;
     text-decoration:none;
-    font-size:28px;
-    box-shadow:0 8px 18px rgba(0,0,0,.35);
-    transition:.3s;
-}
-
-.back-btn span{
-    position:relative;
-    top:-5px;
+    background:#4b90e2;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 520;
+    padding:8px 12px;
+    border-top-left-radius: 8px;
+    border-bottom-right-radius: 12px;
 }
 
 .back-btn:hover{
-    background:black;
-    color:white;
+    background:#2b5f93 ;
+    font-size: 14px;
+
 }
+
 
 .message{
     padding:10px;

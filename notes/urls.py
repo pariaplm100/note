@@ -18,4 +18,10 @@ urlpatterns = [
     path("view-profile/",views.view_profile,name="view_profile"),
     path("edit-profile/",views.edit_profile,name="edit_profile"),
     path("Course&Notes/", views.courses_notes, name="Course_Notes"),
+    path("note/<int:note_id>/", views.note_detail, name="note_detail"),
+    path("create-note-page", views.create_note_in_CourseNote, name="create_note_in_CourseNote"),
+    path("edite-course_notes/<int:note_id>/", views.edit_course_notes, name="edit_course_notes"),
+    path("delete-file/<int:file_id>/", views.delete_file, name="delete_file"),
+    path("note-files/<int:id>/", views.note_files, name="note_files"),
+
 ]

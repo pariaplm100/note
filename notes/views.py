@@ -12,15 +12,18 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.cache import never_cache
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.db.models import Count
 from .models import Course, Note
 from random import randint
 from time import time
 from .models import *
+from accounts.models import Profile
 
 @login_required
 def courses_notes(request):
     search = request.GET.get("search", "").strip()
-    notes = Note.objects.filter(author=request.user).order_by("-create_time")
+    notes = Note.objects.filter(author=request.user).annotate(
+        files_count = Count("files") ).order_by("-create_time") 
 
     if search:
         notes = notes.filter(
@@ -59,34 +62,60 @@ def send_otp(request, email):
     
 
 def ContactUs_view(request):
+
+    if request.user.is_authenticated:
+        courses = Course.objects.filter(author=request.user)
+    else:
+        courses = Course.objects.none()
+
     if request.method == "POST":
         form = ContactUsForm(request.POST)
-        messages.success(request, "Your message has been sent successfully. Thank you for contacting us!")
+
         if form.is_valid():
             form.save()
+            messages.success(
+                request,
+                "Your message has been sent successfully. Thank you for contacting us!"
+            )
             return redirect("notes:ContactUs")
     else:
         form = ContactUsForm()
+
+    return render(request, "contact-us.html", {
+        "form": form,
+        "courses": courses,
+    })
     
-    return render(request, "contact-us.html", {"form": form})
+    
     
 def AboutUs_view(request):
+    if request.user.is_authenticated:
+        courses = Course.objects.filter(author=request.user)
+    else:
+        courses = Course.objects.none()
+
     if request.method == "POST":
         form = AboutusForm(request.POST)
+
         if form.is_valid():
             form.save()
-            return render(request, "AboutUs.html", {"form": form})
     else:
         form = AboutusForm()
-    return render(request, "AboutUs.html", {"form": form})
+
+    return render(request, "AboutUs.html", { "form": form, "courses": courses,})
+     
        
        
 def home(request):
     return render(request, "home.html")
 
 
+@login_required
 def profile_view(request):
-    return render(request,'profile.html')
+    
+    profile = Profile.objects.get(user = request.user)
+     
+    return render(request,'profile.html',{"profile":profile})
     
     
 def home_view(request):
@@ -157,12 +186,104 @@ def create_note(request):
 def delete_note(request, note_id):
     try:
         note = Note.objects.get(id=note_id  ,  author=request.user)
+        
+        course = note.course
         course_id = note.course.id
         note.delete()
+        course_deleted = False
+        
+        if not course.notse.exists():
+            course.delete()
+            course_deleted = True
 
         return JsonResponse({"success": True,"course_id": course_id})
     except Note.DoesNotExist:
         return JsonResponse({"success": False,"error": "Note not found"}, status=404)
+
+    
+@login_required
+def delete_file(request, file_id):
+
+    file = get_object_or_404(
+        NoteFile,
+        id=file_id,
+        note__author=request.user
+    )
+
+    note_id = file.note.id
+
+    file.delete()
+
+    return redirect(
+        "notes:edit_course_notes",
+        note_id=note_id
+    )    
+
+
+@login_required
+def create_note_in_CourseNote(request):
+
+    if request.method == "POST":
+
+        course_name = request.POST.get("course_name")
+        topic = request.POST.get("topic")
+        uploaded_files = request.FILES.getlist("files")
+
+        course, created = Course.objects.get_or_create(
+            author=request.user,
+            name=course_name
+        )
+
+        note = Note.objects.create(
+            author=request.user,
+            course=course,
+            name=course_name,
+            topic=topic,
+        )
+
+        for file in uploaded_files:
+            NoteFile.objects.create(
+                note=note,
+                file=file
+            )
+
+        messages.success(request, "Note created successfully.")
+        return redirect("notes:Course_Notes")
+
+    return render(request, "create_note_in_CourseNote.html")
+
+
+
+@login_required
+def edit_course_notes(request, note_id):
+
+    note = get_object_or_404(
+        Note,
+        id=note_id,
+        author=request.user
+    )
+
+    if request.method == "POST":
+
+        note.name = request.POST.get("name")
+        note.topic = request.POST.get("topic")
+        note.save()
+
+        uploaded_files = request.FILES.getlist("files")
+
+        for file in uploaded_files:
+            NoteFile.objects.create(
+                note=note,
+                file=file
+            )
+
+        return redirect("notes:note_detail", note_id=note.id)
+
+    context = {
+        "note": note,
+    }
+
+    return render(request, "edit_course_notes.html", context)
     
     
 @login_required
@@ -174,11 +295,16 @@ def update_note(request, note_id):
         note.name = request.POST.get("name")
         note.topic = request.POST.get("topic")
         note.save()
-
+        uploaded_files = request.FILES.getlist("files")
+        
+        for f in uploaded_files:
+            NoteFile.objects.create(note=note, file=f)
+        
         files_data = []
 
         for f in note.files.all():
             files_data.append({
+                "id":f.id,
                 "name": f.file.name.split("/")[-1],
                 "url": f.file.url
             })
@@ -195,6 +321,20 @@ def update_note(request, note_id):
             "error": "Note not found"
         }, status=404)
         
+
+def note_files(request, id):
+    note = Note.objects.get(id=id)
+    files = []
+    for f in note.files.all():
+
+        files.append({
+            "id": f.id,
+            "name": f.file.name.split("/")[-1],
+            "url": f.file.url
+        })
+
+    return JsonResponse({"files": files})
+
        
 @login_required
 def confirm_delete_account(request):
@@ -286,7 +426,24 @@ def view_profile(request):
 
     return render(request,"view_profile.html",context)
     
+@login_required
+def note_detail(request, note_id):
 
+    note = get_object_or_404(
+        Note,
+        id=note_id,
+        author=request.user
+    )
+
+    return render(
+        request,
+        "note_detail.html",
+        {
+            "note": note
+        }
+    )
+    
+    
 @login_required
 def edit_profile(request):
     profile = request.user.profile
@@ -317,3 +474,15 @@ def edit_profile(request):
         return redirect("notes:view_profile")
 
     return render(request, "edit_profile.html", {"profile": profile})
+
+
+
+@login_required
+@require_POST
+def delete_file(request, file_id):
+
+    file = NoteFile.objects.get(id=file_id)
+    file.file.delete(save=False)
+    file.delete()
+
+    return JsonResponse({"success": True, "file_id": file_id})
