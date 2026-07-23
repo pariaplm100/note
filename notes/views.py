@@ -134,6 +134,22 @@ def home_view(request):
     return render(request, "home.html", context)
 
 @login_required
+def home_notes_api(request):
+
+    notes = Note.objects.filter(course__author=request.user)
+
+    data = []
+
+    for note in notes:
+        data.append({
+            "id": note.id,
+            "name": note.name,
+            "topic": note.topic,
+        })
+
+    return JsonResponse({"notes": data})
+
+@login_required
 @require_POST
 def create_note(request):
     
@@ -167,9 +183,10 @@ def create_note(request):
     
     for f in note.files.all():
         files_data.append({
-                "name": f.file.name.split("/")[-1],
-                "url": f.file.url
-            })
+            "id": f.id,
+            "name": f.file.name.split("/")[-1],
+            "url": f.file.url
+        })
 
     return JsonResponse({
         "id": note.id,
@@ -192,16 +209,19 @@ def delete_note(request, note_id):
         note.delete()
         course_deleted = False
         
-        if not course.notse.exists():
+        if not course.notes.exists():
             course.delete()
             course_deleted = True
 
-        return JsonResponse({"success": True,"course_id": course_id})
+        return JsonResponse({"success": True,
+                             "course_id": course_id,
+                             "course_deleted": course_deleted})
     except Note.DoesNotExist:
         return JsonResponse({"success": False,"error": "Note not found"}, status=404)
 
     
 @login_required
+@require_POST
 def delete_file(request, file_id):
 
     file = get_object_or_404(
@@ -210,15 +230,12 @@ def delete_file(request, file_id):
         note__author=request.user
     )
 
-    note_id = file.note.id
-
     file.delete()
 
-    return redirect(
-        "notes:edit_course_notes",
-        note_id=note_id
-    )    
-
+    return JsonResponse({
+        "success": True,
+        "file_id": file_id,
+    })
 
 @login_required
 def create_note_in_CourseNote(request):
@@ -476,13 +493,19 @@ def edit_profile(request):
     return render(request, "edit_profile.html", {"profile": profile})
 
 
-
 @login_required
 @require_POST
 def delete_file(request, file_id):
 
-    file = NoteFile.objects.get(id=file_id)
-    file.file.delete(save=False)
+    file = get_object_or_404(
+        NoteFile,
+        id=file_id,
+        note__author=request.user
+    )
+
     file.delete()
 
-    return JsonResponse({"success": True, "file_id": file_id})
+    return JsonResponse({
+        "success": True,
+        "file_id": file_id,
+    })

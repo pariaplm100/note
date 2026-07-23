@@ -134,27 +134,23 @@
     });
     
     const courseTitles = document.querySelectorAll(".course-title");
-    courseTitles.forEach(function(title){
-        title.addEventListener("click", function(){
-            
-            const notes = this.nextElementSibling;
+    document.querySelector(".sidebar-body").addEventListener("click", function (e) {
 
-            if(notes.style.display === "block"){
-                
-                notes.style.display = "none";
-                this.innerHTML =
-                    "&#9656; " + this.textContent.substring(2);
-            }
-            
-            else{
-                notes.style.display = "block";
-                this.innerHTML =
-                    "&#9663; " + this.textContent.substring(2);
-            }
+        const title = e.target.closest(".course-title");
 
-        });
-    });
-    
+        if (!title) return;
+
+        const notes = title.nextElementSibling;
+        const arrow = title.querySelector(".arrow");
+
+        if (notes.style.display === "block") {
+            notes.style.display = "none";
+            arrow.innerHTML = "&#9656;";
+        } else {
+            notes.style.display = "block";
+            arrow.innerHTML = "&#9662;";
+        }
+    });    
     function goToNote(id){
         const card = document.getElementById(`note-${id}`);
 

@@ -23,5 +23,6 @@ urlpatterns = [
     path("edite-course_notes/<int:note_id>/", views.edit_course_notes, name="edit_course_notes"),
     path("delete-file/<int:file_id>/", views.delete_file, name="delete_file"),
     path("note-files/<int:id>/", views.note_files, name="note_files"),
+    path("home-notes-api/", views.home_notes_api, name="home_notes_api"),
 
 ]

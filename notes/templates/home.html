@@ -21,7 +21,8 @@
                 
                 
                 <textarea id="courseNote" placeholder="Write your note..."></textarea>
-                <input type="file" id="courseFiles" multiple>               
+                <input type="file" id="courseFiles" multiple> 
+                <div id="popupFiles"></div>
                 <button id="saveBtn">Save</button>
             </div>    
         </div>
@@ -114,8 +115,8 @@ saveBtn.addEventListener("click", function () {
     const topic = document.getElementById("courseNote").value;
     const files = document.getElementById("courseFiles").files;
 
-    if(courseName.trim() === "" || topic.trim() === ""){
-        alert("Please enter course name and note.");
+    if(courseName.trim() === "" ){
+        alert("Please enter course name.");
         return;
     }
 
@@ -148,38 +149,32 @@ saveBtn.addEventListener("click", function () {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
-
         let filesHtml = "";
 
+        if (data.files.length > 0) {
 
-        let filesHtml = "";
-
-        if(data.files && data.files.length > 0){
-
-            filesHtml += `
-                <div class="files-section">
-                    <h4>Files:</h4>
-            `;
+            filesHtml += `<div class="files-section">`;
 
             data.files.forEach(function(file){
+
                 filesHtml += `
-
                     <div class="file-item" id="file-${file.id}">
-
                         <a href="${file.url}" target="_blank">
-                        ${file.name}
-                        </a><br>
+                            ${file.name}
+                        </a>
 
-                        <button type="button"   class="delete-file"    onclick="deleteFile(${file.id})"> &times; </button>
-
+                        <button
+                            class="delete-file"
+                            onclick="deleteFile(${file.id})">
+                            &times;
+                        </button>
                     </div>
                 `;
+
             });
 
             filesHtml += `</div>`;
         }
-
         const cardHtml = `
             <div class="note-card" id="note-${data.id}">
                 <div class="card-header">
@@ -194,7 +189,10 @@ saveBtn.addEventListener("click", function () {
 
                     <div class="card-actions">
 
-                        <button class="edit-btn" onclick="editNote( ${data.id}, '${data.name}', '${data.topic}' )">
+                        <button class="edit-btn" onclick="editNote(
+                        ${data.id},
+                        '${data.name}', 
+                        '${data.topic}' )">
                             &#9998;Edit
                         </button>
 
@@ -254,15 +252,20 @@ saveBtn.addEventListener("click", function () {
             if(data.files && data.files.length > 0){
 
                 data.files.forEach(function(file){
-
                     sidebarFilesHtml += `
                         <div class="sidebar-file" id="sidebar-file-${file.id}">
-                            📄 ${file.name}
+                            <a href="${file.url}" target="_blank">
+                                ${file.name}
+                            </a>
+
+                            <span class="delete-file"
+                                onclick="deleteFile(${file.id})">
+                                &times;
+                            </span>
                         </div>
                     `;
                 });
             }
-
             notesList.innerHTML += `
                 <div class="sidebar-note-wrapper">
 
@@ -289,6 +292,11 @@ saveBtn.addEventListener("click", function () {
             document.getElementById(
                 `note-${editingId}`
             ).outerHTML = cardHtml;
+            const sidebarNote = document.getElementById(`sidebar-note-${editingId}`);
+
+            if (sidebarNote) {
+                sidebarNote.innerHTML = `&#9113; ${data.name}`;
+            }
         }
 
         document.getElementById("courseName").value = "";
@@ -307,6 +315,7 @@ saveBtn.addEventListener("click", function () {
 });
 
 function deleteFile(fileId){
+
     if(!confirm("Delete this file?")){
         return;
     }
@@ -318,18 +327,24 @@ function deleteFile(fileId){
             document.getElementById("csrfToken").value
         }
     })
-    .then(r=>r.json())
-    .then(data=>{
+    .then(response => response.json())
+    .then(data => {
 
         if(data.success){
-            document.getElementById( `file-${fileId}`  )
-            ?.remove();
-            document.getElementById(  `sidebar-file-${fileId}` )
-            ?.remove();
+            document.getElementById(`file-${fileId}`)?.remove();
+            document.getElementById(`sidebar-file-${fileId}`)?.remove();
+            const popupFile = document.querySelector(
+                `#popupFiles #file-${fileId}`
+            );
+
+            if(popupFile){
+                popupFile.remove();
+            }
+
         }
 
-    });
-
+    })
+    .catch(error => console.log(error));
 }
 
 function editNote(id,name,topic){
@@ -386,9 +401,13 @@ function deleteNote(id){
                 card.remove();
             }
 
-            const sidebarNote =  document.getElementById(`sidebar-note-${id}`);
-            if(sidebarNote){
-                sidebarNote.remove();
+            const sidebarNote = document.getElementById(`sidebar-note-${id}`);
+
+            if (sidebarNote) {
+                const wrapper = sidebarNote.closest(".sidebar-note-wrapper");
+                if (wrapper) {
+                    wrapper.remove();
+                }
             }
 
             if (data.course_deleted) {  //؟
