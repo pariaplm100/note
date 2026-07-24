@@ -154,7 +154,7 @@ def home_notes_api(request):
             "id": note.id,
             "name": note.name,
             "topic": note.topic,
-        }).order_by("-create_time")
+        })
 
     return JsonResponse({"notes": data})
 
@@ -513,21 +513,3 @@ def edit_profile(request):
         return redirect("notes:view_profile")
 
     return render(request, "edit_profile.html", {"profile": profile})
-
-
-@login_required
-@require_POST
-def delete_file(request, file_id):
-
-    file = get_object_or_404(
-        NoteFile,
-        id=file_id,
-        note__author=request.user
-    )
-
-    file.delete()
-
-    return JsonResponse({
-        "success": True,
-        "file_id": file_id,
-    })

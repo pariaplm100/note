@@ -299,7 +299,7 @@ def verify_email_view(request):
                 return redirect("accounts:login_page")
 
             if not can_resend(request):
-                messages.error(request, "Please wait 60 seconds before requesting another code.")
+                messages.error(request, "Please wait 120 seconds before requesting another code.")
                 
                 request.session.pop("register_captcha", None)
                 return redirect("accounts:verify_email")
@@ -416,7 +416,7 @@ def verify_reset_password_view(request):
             user = User.objects.get(username=username)
 
             if not can_resend(request):
-                messages.error(request, "Please wait 60 seconds before requesting another code.")
+                messages.error(request, "Please wait 120 seconds before requesting another code.")
                 return redirect("accounts:verify_reset_password")
 
             send_otp(request, user.email)
