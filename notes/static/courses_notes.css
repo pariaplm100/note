@@ -24,6 +24,44 @@ body{
     text-shadow:0 2px 8px rgba(0,0,0,.2);
 }
 
+.back-home{
+    position: fixed;
+    top: 5px;
+    left: -5px;
+    writing-mode: vertical-rl;
+    text-decoration: none;
+    padding:20px 16px;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+    background:#3563b7;
+    color: #fff;
+    font-weight: bold;
+}
+
+.back-home:hover{
+    padding:20px 20px;
+    background: #2976ba;
+}
+
+.back-profile{
+    position: fixed;
+    top: 160px;
+    left: -5px;
+    writing-mode: vertical-rl;
+    text-decoration: none;
+    padding:20px 16px;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+    background:#3563b7;
+    color: #fff;
+    font-weight: bold;
+}
+
+.back-profile:hover{
+    padding:20px 20px;
+    background: #2976ba;
+}
+
 .search-box{
     display:flex;
     justify-content:center;

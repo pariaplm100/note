@@ -30,11 +30,10 @@
 
         <input
             type="text"
-            name="name"
+            name="course_name"
             class="text-input"
-            value="{{ note.name }}"
+            value="{{ note.course.name }}"
             required>
-
 
         <label>Note</label>
 
@@ -58,12 +57,9 @@
                         📄 {{ file.file.name|cut:"notes_files/" }}
                     </span>
 
-                    <a href="{% url 'notes:delete_file' file.id %}" class="delete-file" 
-                    onclick="return confirm('Are you Sure you want to delete this file?' );" >
-
+                    <button type="button" class="delete-file" onclick="deleteFile( {{ file.id }} )">
                         Delete
-
-                    </a>
+                    </button>    
 
                 </div>
 
@@ -80,10 +76,7 @@
 
         <label>Add New Files</label>
 
-        <input
-            type="file"
-            name="files"
-            multiple>
+        <input type="file" name="files" multiple>
 
 
         <div class="buttons">
@@ -110,6 +103,45 @@
     </form>
 
 </div>
+
+<script>
+
+function deleteFile(id){
+
+    if(!confirm("Are you sure you want to delete this file?")){
+        return;
+    }
+
+    fetch(`/delete-file/${id}/`, {
+
+        method: "POST",
+
+        headers:{
+            "X-CSRFToken": "{{ csrf_token }}"
+        }
+
+    })
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        if(data.success){
+
+            location.reload();
+
+        }
+        else{
+
+            alert("File could not be deleted");
+
+        }
+
+    })
+
+}
+
+</script>
 
 </body>
 </html>

@@ -119,8 +119,16 @@ def profile_view(request):
     
     
 def home_view(request):
+    search = request.GET.get("search","").strip()
     if request.user.is_authenticated:
         notes = Note.objects.filter(course__author=request.user)
+        
+        if search:
+            notes = notes.filter(
+                Q(name__icontains = search) |
+                Q(topic__icontains = search)
+            )
+            
         courses = Course.objects.filter(author=request.user)
     else:
         notes = Note.objects.none()
@@ -129,6 +137,7 @@ def home_view(request):
     context = {
         "notes": notes,
         "courses": courses,
+        "search": search,
     }
     
     return render(request, "home.html", context)
@@ -136,7 +145,7 @@ def home_view(request):
 @login_required
 def home_notes_api(request):
 
-    notes = Note.objects.filter(course__author=request.user)
+    notes = Note.objects.filter(course__author=request.user).order_by("-create_time")
 
     data = []
 
@@ -145,7 +154,7 @@ def home_notes_api(request):
             "id": note.id,
             "name": note.name,
             "topic": note.topic,
-        })
+        }).order_by("-create_time")
 
     return JsonResponse({"notes": data})
 
@@ -181,7 +190,7 @@ def create_note(request):
     files_data = []
     
     
-    for f in note.files.all():
+    for f in note.files.all().order_by("-create_time"):
         files_data.append({
             "id": f.id,
             "name": f.file.name.split("/")[-1],
@@ -282,7 +291,13 @@ def edit_course_notes(request, note_id):
 
     if request.method == "POST":
 
-        note.name = request.POST.get("name")
+        course_name = request.POST.get("course_name","").strip()
+        
+        if course_name:
+            note.course.name = course_name
+            note.course.save()
+                    
+        note.name = request.POST.get("course_name")
         note.topic = request.POST.get("topic")
         note.save()
 
@@ -309,7 +324,12 @@ def update_note(request, note_id):
     try:
         note = Note.objects.get(id=note_id, author=request.user)
 
-        note.name = request.POST.get("name")
+        course_name = request.POST.get("course_name")
+        if course_name:
+            note.course.name = course_name
+            note.course.save()
+            
+        note.name = request.POST.get("course_name")
         note.topic = request.POST.get("topic")
         note.save()
         uploaded_files = request.FILES.getlist("files")
@@ -319,7 +339,7 @@ def update_note(request, note_id):
         
         files_data = []
 
-        for f in note.files.all():
+        for f in note.files.all().order_by("-create_time"):
             files_data.append({
                 "id":f.id,
                 "name": f.file.name.split("/")[-1],
@@ -330,6 +350,8 @@ def update_note(request, note_id):
             "id": note.id,
             "name": note.name,
             "topic": note.topic,
+            "course_id":note.course.id,
+            "course_name":note.course.name,
             "files": files_data,
         })
 
@@ -342,8 +364,8 @@ def update_note(request, note_id):
 def note_files(request, id):
     note = Note.objects.get(id=id)
     files = []
-    for f in note.files.all():
-
+    
+    for f in note.files.all().order_by("-create_time"):
         files.append({
             "id": f.id,
             "name": f.file.name.split("/")[-1],

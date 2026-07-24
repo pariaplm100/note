@@ -7,7 +7,15 @@
         <section class="toolbar">
             <div class="right">
                 <button type="button" class="new" id="newBtn">+ New</button>
-                <input size=50  type="text" class="search-box" placeholder="&#x1F50D; Search"/>
+
+            <form method="GET" class="search-box">
+                <input size="50" type="text" name="search" placeholder="Search..." value="{{ search }}">
+
+                <button type="submit" class="search-button">
+                    Search
+                </button>
+            </form>
+
             </div >
                 <p class="right2">Click on + New to add your course information and notes.</p>
                 <p class="right3"></p>
@@ -30,7 +38,7 @@
             {% for note in notes %}
             <div class="note-card" id="note-{{ note.id }}">
                 <div class="card-header">
-                    <h2>{{ note.name }}</h2>
+                    <h2>{{ note.course.name }}</h2>
                 </div>
 
                 <div class="card-body">
@@ -288,14 +296,63 @@ saveBtn.addEventListener("click", function () {
             `;
             notesContainer.innerHTML += cardHtml;
         }
+        
         else{
+
             document.getElementById(
                 `note-${editingId}`
             ).outerHTML = cardHtml;
-            const sidebarNote = document.getElementById(`sidebar-note-${editingId}`);
+
+            const sidebarNote = document.getElementById(
+                `sidebar-note-${editingId}`
+            );
 
             if (sidebarNote) {
+
                 sidebarNote.innerHTML = `&#9113; ${data.name}`;
+            }
+
+            const courseTitle = document.querySelector(
+                `#course-${data.course_id} .course_title`
+            );
+
+            if(courseTitle){
+                courseTitle.innerHTML = `
+                <span class="arrow">&#9656;</span>
+                ${data.course_name}
+                `;
+            }
+
+            const sidebarFiles = document.getElementById(
+                `sidebar-files-${editingId}`
+            );
+
+
+            if(sidebarFiles){
+                let filesHtml = "";
+
+                data.files.forEach(function(file){
+
+                    filesHtml += `
+                        <div class="sidebar-file" 
+                            id="sidebar-file-${file.id}">
+
+                            <a href="${file.url}" target="_blank">
+                                ${file.name}
+                            </a>
+
+                            <span class="delete-file"
+                                onclick="deleteFile(${file.id})">
+
+                                &times;
+                            </span>
+
+                        </div>
+                    `;
+
+                });
+
+                sidebarFiles.innerHTML = filesHtml;
             }
         }
 
@@ -306,6 +363,8 @@ saveBtn.addEventListener("click", function () {
 
 
         noteModal.style.display = "none";
+
+        location.reload();
 
         editingId = null; //حالت ویرایش تموم میشه
     })
@@ -334,12 +393,15 @@ function deleteFile(fileId){
             document.getElementById(`file-${fileId}`)?.remove();
             document.getElementById(`sidebar-file-${fileId}`)?.remove();
             const popupFile = document.querySelector(
-                `#popupFiles #file-${fileId}`
+                `#popupFiles #file-${fileId}`    
+
             );
 
             if(popupFile){
                 popupFile.remove();
             }
+
+        location.reload();    
 
         }
 
@@ -375,6 +437,7 @@ function editNote(id,name,topic){
 
     });
     noteModal.style.display = "flex";
+
 }
 
 
@@ -399,6 +462,9 @@ function deleteNote(id){
             const card = document.getElementById(`note-${id}`);
             if(card){
                 card.remove();
+
+            location.reload();
+                
             }
 
             const sidebarNote = document.getElementById(`sidebar-note-${id}`);
@@ -407,7 +473,8 @@ function deleteNote(id){
                 const wrapper = sidebarNote.closest(".sidebar-note-wrapper");
                 if (wrapper) {
                     wrapper.remove();
-                }
+                }    
+
             }
 
             if (data.course_deleted) {  //؟
@@ -417,6 +484,9 @@ function deleteNote(id){
                     course.remove();
                 }
             }
+
+        location.reload();   
+            
         }
     })
     .catch(error => {

@@ -11,6 +11,15 @@
 </head>
 <body>
 
+<a href="{% url 'notes:home' %}" class="back-home">
+    <span class back-home-span> Back to Home </span>
+</a>    
+
+<a href="{% url 'notes:profile' %}" class="back-profile">
+    <span class back-profile-span> Back to Profile </span>
+</a>    
+
+
 <div class="container">
 
     <h1 class="title">Courses & Notes</h1>
@@ -38,12 +47,10 @@
 
             <a href="{% url 'notes:note_detail' note.id %}" class="card-link">
 
-                <h3>{{ note.name }}</h3>
+                <h3>{{ note.course.name }}</h3>  
 
-                <p class="date">
-                    Created
                 <p>
-                    {{ note.topic|truncatechars:100 }}
+                    {{ note.topic|truncatechars:120 }}
                 </p>
 
             </a>

@@ -10,11 +10,11 @@
     <link rel="stylesheet" href="{% static 'note_detail.css' %}">
 </head>
 <body>
-
-<div class="container">
+        
+<div class="container">    
 
     <h1 class="title">
-        {{ note.name }}
+        {{ note.course.name }}
     </h1>
 
     <div class="section">
@@ -24,6 +24,17 @@
         <div class="note-text">
             {{ note.topic|linebreaks }}
         </div>
+
+        <div class="date-info"> 
+            <span class="label"> Create Time </span>
+            <span class="value">{{ note.create_time|date:"d M Y - H:i" }} </span>
+        </div>
+        {% if note.create_time|date:"d M Y - H:i" != note.update_time|date:"d M Y - H:i" %}
+            <div class="date-update-info"> 
+                <span class="label"> Update Time </span>
+                <span class="value">{{ note.update_time|date:"d M Y - H:i" }} </span>
+            </div>
+        {% endif %}    
 
     </div>
 
@@ -61,6 +72,10 @@
 
         <a href="{% url 'notes:edit_course_notes' note.id %}" class="edit-btn">
             Edit Note
+        </a>
+
+        <a href="{% url 'notes:Course_Notes' %}" class="back-btn">
+            Back 
         </a>
 
     </div>

@@ -6,7 +6,7 @@ class Profile(models.Model):
     
     phone_number = models.CharField(max_length=20, blank=True,unique=True)
     
-    image = models.ImageField(upload_to="profile_images/",default="profile_images/default.png")
+    image = models.ImageField(upload_to="profile_images/",default="default_profile/default_profile.png.webp")
     
     bio = models.TextField(blank=True)
 

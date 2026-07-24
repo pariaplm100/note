@@ -36,6 +36,48 @@ body{
     margin-bottom:15px;
 }
 
+.date-info{
+    margin-top: 12px;
+    padding: 10px 14px;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    background: #e0ebf6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.date-info .label{
+    font-weight: bold;
+    color:#3563b7;
+}
+
+.date-info .value{
+    font-weight: bold;
+    color:#3563b7;
+}
+
+.date-update-info{
+    margin-top: 12px;
+    padding: 10px 14px;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    background: #e0ebf6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.date-update-info .label{
+    font-weight: bold;
+    color:#3563b7;
+}
+
+.date-update-info .value{
+    font-weight: bold;
+    color:#3563b7;
+}
+
 .note-text{
     background:#eef5ff;
     padding:20px;
@@ -76,7 +118,7 @@ body{
     margin-top:30px;
 }
 
-.back-btn,
+
 .edit-btn{
     text-decoration:none;
     color:#fff;
@@ -87,11 +129,22 @@ body{
 }
 
 .back-btn{
-    background:#777;
+    position: fixed;
+    top: 5px;
+    left: -5px;
+    writing-mode: vertical-rl;
+    text-decoration: none;
+    padding:20px 16px;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+    background:#3563b7;
+    color: #fff;
+    font-weight: bold;
 }
 
 .back-btn:hover{
-    background:#555;
+    padding:20px 20px;
+    background: #2976ba;
 }
 
 .edit-btn{
@@ -99,5 +152,5 @@ body{
 }
 
 .edit-btn:hover{
-    background:#244f9d;
+    background:#2b9ed8;
 }

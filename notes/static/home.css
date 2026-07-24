@@ -75,7 +75,7 @@ body{
 
 .right2{
     margin: 0;
-    color: #5b5d63;
+    color: #1d43b6;
     font-size: 14px;
 }
 
@@ -85,7 +85,57 @@ body{
 }
  
 .search-box{
-    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
+    position: relative;
+    right: -710px;
+    top:30px;
+}
+
+.search-box input{
+    width: 450px;
+    padding: 12px 18px;
+    border: 2px solid #4a90e2;
+    border-radius: 30px;
+    font-size: 16px;
+    outline: none;
+    background: #f8fbff;
+    color: #1f2937;
+    transition: all 0.3s ease;
+}
+
+.search-box input:focus{
+    border-color: #2563eb;
+    box-shadow: 0 0 10px rgba(37,99,235,0.3);
+}
+
+.search-box input::placeholder{
+    color: #7b8ca7;
+}
+
+.search-button{
+    padding: 12px 24px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(135deg,#3b82f6,#2563eb);
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.search-button:hover{
+    transform: translateY(-2px);
+    background: #2eaadc;
+    box-shadow: 0 8px 18px rgba(37,99,235,0.35);
+}
+
+.search-button:active{
+    transform: scale(0.97);
 }
 
 button{
@@ -103,14 +153,17 @@ button{
 }
 
 .new{
-    background:#2eaadc;
+    background:linear-gradient(135deg,#3b82f6,#2563eb);
     color:white;
     padding:7px 16px;
-    border-radius:6px;
+    border-radius:30px;
+    position: relative;
+    right: 4px;
+    top:25px;
 }
 .new:hover{
-    background-color: #126383;
     cursor: pointer;
+    background: #116688;
 }
 
 .notes-container{
@@ -386,14 +439,14 @@ input[type="file"]::file-selector-button:hover{
 .delete-btn{
     padding: 8px 15px;
     border: none;
-    border-radius: 5px;
+    border-radius: 30px;
     cursor: pointer;
     color: white;
-    background: #2eaadc;
+    background:linear-gradient(135deg,#5b93ed,#6689d3);
 
 }
 
 .edit-btn:hover,
 .delete-btn:hover{
-    background: #126383;
+    background: #2da7d7;
 }

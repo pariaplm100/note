@@ -4,7 +4,8 @@ from django.contrib.auth.models import User
 class Course(models.Model):
     name = models.CharField(max_length=100)
     author = models.ForeignKey(User, on_delete=models.CASCADE)    
-    
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
     
 class Note(models.Model):
     author = models.ForeignKey( User, on_delete=models.CASCADE, related_name="notes")
@@ -53,7 +54,12 @@ class ContactUs(models.Model):
 
 class NoteFile(models.Model):
     note = models.ForeignKey(Note,on_delete=models.CASCADE,related_name="files")
-    file = models.FileField(upload_to="notes_files/")  
+    file = models.FileField(upload_to="notes_files/")
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ["-create_time"]  
         
         
     
