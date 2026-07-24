@@ -2099,5 +2099,5 @@ class CreateNoteInCourseNoteViewTest(TestCase):
 
         self.assertEqual(
             note.topic,
-            "Django"
-        )                
+            "Django"    
+        )                 
