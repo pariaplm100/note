@@ -146,10 +146,10 @@ body{
 
 
 .icon-box-hour .icon-box-hour-h3-h{
-    font-size: 80px;!important;
-    position:relative;
-    right:-400px;
-    top:-200px
+    position: relative;
+    right:-750px;
+    top:-200px;
+    font-size: 80px;
 }
 
 .icon-box-email a,    
@@ -168,7 +168,7 @@ body{
 
 .icon-box-hour p{
     position:relative;
-    right:-400px;
+    right:-760px;
     top:-208px;
 }
 
