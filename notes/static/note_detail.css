@@ -1,0 +1,156 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    background:linear-gradient(135deg,#8db8e8,#d7ecff);
+    min-height:100vh;
+    padding:40px 0;
+}
+
+.container{
+    width:90%;
+    max-width:900px;
+    margin:auto;
+    background:#fff;
+    border-radius:20px;
+    padding:35px;
+    box-shadow:0 10px 25px rgba(0,0,0,.15);
+}
+
+.title{
+    text-align:center;
+    color:#3563b7;
+    margin-bottom:35px;
+}
+
+.section{
+    margin-bottom:35px;
+}
+
+.section h2{
+    color:#3563b7;
+    margin-bottom:15px;
+}
+
+.date-info{
+    margin-top: 12px;
+    padding: 10px 14px;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    background: #e0ebf6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.date-info .label{
+    font-weight: bold;
+    color:#3563b7;
+}
+
+.date-info .value{
+    font-weight: bold;
+    color:#3563b7;
+}
+
+.date-update-info{
+    margin-top: 12px;
+    padding: 10px 14px;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    background: #e0ebf6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.date-update-info .label{
+    font-weight: bold;
+    color:#3563b7;
+}
+
+.date-update-info .value{
+    font-weight: bold;
+    color:#3563b7;
+}
+
+.note-text{
+    background:#eef5ff;
+    padding:20px;
+    border-radius:15px;
+    line-height:1.8;
+    color:#444;
+    white-space:pre-wrap;
+}
+
+.files{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.file-card{
+    text-decoration:none;
+    color:#3563b7;
+    background:#eef5ff;
+    padding:15px;
+    border-radius:12px;
+    transition:.3s;
+    font-weight:bold;
+}
+
+.file-card:hover{
+    background:#d8e8ff;
+}
+
+.empty{
+    color:#888;
+    font-style:italic;
+}
+
+.buttons{
+    display:flex;
+    justify-content:space-between;
+    margin-top:30px;
+}
+
+
+.edit-btn{
+    text-decoration:none;
+    color:#fff;
+    padding:12px 24px;
+    border-radius:12px;
+    font-weight:bold;
+    transition:.3s;
+}
+
+.back-btn{
+    position: fixed;
+    top: 5px;
+    left: -5px;
+    writing-mode: vertical-rl;
+    text-decoration: none;
+    padding:20px 16px;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+    background:#3563b7;
+    color: #fff;
+    font-weight: bold;
+}
+
+.back-btn:hover{
+    padding:20px 20px;
+    background: #2976ba;
+}
+
+.edit-btn{
+    background:#3563b7;
+}
+
+.edit-btn:hover{
+    background:#2b9ed8;
+}

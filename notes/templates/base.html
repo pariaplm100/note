@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    
+    {% if messages %}
+    <div id="toast-container">
+        {% for message in messages %}
+            <div class="toast {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>    
+    {% endif %}
+    
+    <button id="menuBtn" class="menu-btn">☰</button>
+    
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            
+            <h3>My Courses</h3>
+            <button id="closeSidebarBtn" class="close-sidebar">&times;</button>
+        </div>
+        <div class="sidebar-body">
+            {% for course in courses %}
+                <div class="course" id="course-{{ course.id }}">
+                    <div class="course-title">
+                        <span class="arrow">&#9656;</span>
+                        {{ course.name }}
+                    </div>
+
+                    <div class="notes-list" id="notes-list-{{ course.id }}">
+                        {% for note in course.notes.all %}
+                            <div class="sidebar-note-wrapper">
+                                <div class="note-item"  id="sidebar-note-{{ note.id }}"  onclick="goToNote({{ note.id }})">
+                                    &#9113; {{ note.name }}
+                                </div>
+
+                                <div class="sidebar-files"  id="sidebar-files-{{ note.id }}">
+
+                                    {% for file in note.files.all %}
+                                        <div class="sidebar-file" id="sidebar-file-{{ file.id }}">
+                                            <a href="{{ file.file.url }}" target="_blank"> {{ file.file.name|cut:"notes_files/" }}</a>
+                                            <span class="delete-file"   onclick="deleteFile({{ file.id }})">&times;</span>
+
+                                        </div>
+                                    {% endfor %}
+
+                                </div>
+
+                            </div>
+
+                        {% empty %}
+                            <div class="note-item">
+                                No notes
+                            </div>
+                        {% endfor %}
+                    </div> 
+                
+                </div>
+            {% empty %}
+                <p>No courses yet.</p>
+            {% endfor %}
+        </div>
+        </div>   
+    <div class="container">
+        <header class="page-header">
+            <nav class="navbar">
+                
+                {% if not request.user.is_authenticated %}
+
+                <a href="{% url 'accounts:signup' %}" class="item-navbar">sing up | Login</a>
+
+                {% else %}
+
+                <p></p>
+
+                {% endif %}
+                
+                {% if request.user.is_authenticated %}
+                    <a href="{% url 'notes:profile' %}" class="profile-link">
+                        {% if request.user.profile.image %}
+                            <img src="{{ request.user.profile.image.url }}" alt="Profile" class="profile-image">
+                        {% else %}
+                            <img src="{% static 'default_profile.png.webp' %}" alt="profile" class="profile-image">
+
+                        {% endif %}
+                    </a>
+
+                    {% endif %}
+                    
+                
+                <a href="{% url 'notes:home' %}" class="item-navbar">Home</a>
+                <a href="{% url 'notes:AboutUs' %}" class="item-navbar">About us</a>
+                <a href="{% url 'notes:ContactUs' %}" class="item-navbar">Contact Us</a>
+                <a href="{% url 'notes:Course_Notes' %}" class="item-navbar">courses | notes</a>
+
+            </nav>
+            <h1 class="Noteorganizer">Note Organizer</h1>
+        </header>
+        
+        {% block content %}
+
+
+
+        {% endblock  %}
+    </div>
+    <script>
+        setTimeout(() => {
+            document.querySelectorAll(".toast").forEach(msg => {
+                msg.style.opacity = "0";
+                msg.style.transform = "translateX(100px)";
+                setTimeout(() => {msg.remove();}, 300);
+            });
+        }, 2500);
+        
+    const menuBtn = document.getElementById("menuBtn");
+    const sidebar = document.getElementById("sidebar");
+    const closeSidebarBtn =document.getElementById("closeSidebarBtn");
+
+    menuBtn.addEventListener("click", function(){
+        sidebar.classList.toggle("active");
+    });
+
+    closeSidebarBtn.addEventListener("click", function(){
+        sidebar.classList.remove("active");
+    });
+    
+    const courseTitles = document.querySelectorAll(".course-title");
+    document.querySelector(".sidebar-body").addEventListener("click", function (e) {
+
+        const title = e.target.closest(".course-title");
+
+        if (!title) return;
+
+        const notes = title.nextElementSibling;
+        const arrow = title.querySelector(".arrow");
+
+        if (notes.style.display === "block") {
+            notes.style.display = "none";
+            arrow.innerHTML = "&#9656;";
+        } else {
+            notes.style.display = "block";
+            arrow.innerHTML = "&#9662;";
+        }
+    });    
+    function goToNote(id){
+        const card = document.getElementById(`note-${id}`);
+
+        if(card){
+            card.scrollIntoView({
+                behavior:"smooth",
+                block:"start"
+            });
+
+            card.classList.add("highlight");
+            setTimeout(function(){
+                card.classList.remove("highlight");
+            },1500);
+        }
+    }
+    document.addEventListener("click", function(event){
+
+       if(
+        sidebar.classList.contains("active") &&
+        !sidebar.contains(event.target) &&
+        !menuBtn.contains(event.target)
+        ){
+        sidebar.classList.remove("active");
+        }
+
+    }); 
+
+    
+    </script>    
+    
+</body>
+</html>

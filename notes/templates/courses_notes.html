@@ -1,0 +1,167 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses and Notes</title>
+
+    <link rel="stylesheet" href="{% static 'courses_notes.css' %}">
+</head>
+<body>
+
+<a href="{% url 'notes:home' %}" class="back-home">
+    <span class back-home-span> Back to Home </span>
+</a>    
+
+<a href="{% url 'notes:profile' %}" class="back-profile">
+    <span class back-profile-span> Back to Profile </span>
+</a>    
+
+
+<div class="container">
+
+    <h1 class="title">Courses & Notes</h1>
+
+    <div class="add-new-course">
+        <a href="{% url 'notes:create_note_in_CourseNote' %}" class="add-btn">
+            + Add Course
+        </a>
+    </div>
+
+    <form method="GET" class="search-box">
+        <input type="text" name="search" placeholder="Search..." value="{{ search }}">
+
+        <button type="submit">
+            Search
+        </button>
+    </form>
+
+
+    {% if page_obj %}
+
+        {% for note in page_obj %}
+
+        <div class="note-card" id="note-{{ note.id }}">
+
+            <a href="{% url 'notes:note_detail' note.id %}" class="card-link">
+
+                <h3>{{ note.course.name }}</h3>  
+
+                <p>
+                    {{ note.topic|truncatechars:120 }}
+                </p>
+
+            </a>
+
+            <div class="card-footer">
+
+                <span class="files-count">
+                    Uploaded Files : {{ note.files_count }}
+                </span>
+
+                <div class="actions">
+
+                    <a href="{% url 'notes:edit_course_notes' note.id %}"
+                       class="edit-btn"
+                       onclick="event.stopPropagation();">
+
+                        Edit
+
+                    </a>
+
+                    <button
+                        type="button"
+                        class="delete-btn"
+                        onclick="event.stopPropagation(); event.preventDefault(); deleteNote({{ note.id }})">
+
+                        Delete
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p class="empty">
+            No notes found.
+        </p>
+
+    {% endif %}
+
+    <div class="pagination">
+
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&search={{ search }}">
+                Previous
+            </a>
+        {% endif %}
+
+        <span>
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&search={{ search }}">
+                Next
+            </a>
+        {% endif %}
+
+    </div>
+
+</div>
+
+<script>
+
+function deleteNote(id){
+
+    if(!confirm("Delete this note?")){
+        return;
+    }
+
+    fetch(`/delete-note/${id}/`,{
+
+        method:"POST",
+
+        headers:{
+            "X-CSRFToken":"{{ csrf_token }}"
+        }
+
+    })
+
+    .then(response => response.json())
+
+    .then(data =>{
+
+        if(data.success){
+
+            document.getElementById(`note-${id}`).remove();
+
+        }
+        else{
+
+            alert(data.error);
+
+        }
+
+    })
+
+    .catch(error =>{
+
+        console.log(error);
+
+    });
+
+}
+
+</script>
+
+</body>
+</html>

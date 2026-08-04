@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{% static 'verify_delete_accounts.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+</head>
+<body>
+    
+
+{% if messages %}
+<div id="toast-container">
+    {% for message in messages %}
+        <div class="toast {{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="container">
+    
+        <a href="{% url 'accounts:login_page' %}" class='back-back'> <span>Back</span> 
+        </a>
+
+    <div class="title">
+        Verify Your Email
+    </div>
+
+    <form method="POST" class="form active">
+        {% csrf_token %}
+
+        <p class="verify-text">
+            We have sent a verification code to
+            <br>
+            <span>{{ email }}</span>
+            <br>
+        </p>
+        
+        <p class='text-alert'>
+            <span>"if you not get code Check your Span files"</span>
+        </p>    
+
+        <input type="text" name="otp" class="otp-input" maxlength="6" placeholder="Enter 6-digit code" autocomplete="one-time-code" required>
+
+        <button type="submit" class="btn">
+            Verify
+        </button>
+    </form>
+        
+    <form method='post'>
+        {% csrf_token %}
+        <button type="submit" name="resend" value="1" class="resend-btn" id="resendBtn" >Resend Code</button>
+        <p id="timer" ></p>
+
+    </form>
+
+</div>
+
+<script>
+    
+let lastResend = Number("{{ last_resend }}");
+let now = Math.floor(Date.now() / 1000);
+
+let remaining = 120 - (now - lastResend);
+
+let btn = document.getElementById("resendBtn");
+let timer = document.getElementById("timer");
+
+if (remaining > 0) {
+
+    btn.disabled = true;
+    timer.innerHTML = `Resend code in ${remaining} seconds`;
+
+    let interval = setInterval(() => {
+
+        remaining--;
+
+        timer.innerHTML = `Resend code in ${remaining} seconds`;
+
+        if (remaining <= 0) {
+
+            clearInterval(interval);
+
+            btn.disabled = false;
+            timer.innerHTML = "You can resend now.";
+
+        }
+
+    }, 1000);
+
+} else {
+
+    btn.disabled = false;
+    timer.innerHTML = "You can resend now.";
+
+}
+
+setTimeout(() => {
+    document.querySelectorAll(".toast").forEach(msg => {
+        msg.style.opacity = "0";
+        msg.style.transform = "translateX(100px)";
+        setTimeout(() => {
+            msg.remove();
+        }, 500);
+    });
+}, 3000);
+
+</script>
+
+</body>
+</html>
