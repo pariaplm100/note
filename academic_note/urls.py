@@ -6,6 +6,7 @@ from accounts.sitemaps import StaticViewSitemap2
 from notes import views
 from django.conf import settings
 from django.conf.urls.static import static
+import debug_toolbar
 
 sitemaps = {
     "static": StaticViewSitemap,
@@ -18,12 +19,16 @@ urlpatterns = [
     path("accounts/", include("django.contrib.auth.urls")),
     path('',include('accounts.urls')),
     path('', include("notes.urls")),
+    
     path(
         "sitemap.xml",
         sitemap,
         {"sitemaps": sitemaps},
         name="django.contrib.sitemaps.views.sitemap",
     ),
+    
+    path('robots.txt', include('robots.urls')),
+    path('__debug__/',include(debug_toolbar.urls)),
 ]
 
 if settings.DEBUG:

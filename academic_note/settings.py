@@ -13,6 +13,10 @@ ALLOWED_HOSTS = []
 
 SITE_ID = 2
 
+#sitemap access to robots
+ROBOTS_USE_SITEMAP = False
+ROBOTS_USE_HOST = False
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -20,10 +24,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar',
     'django.contrib.humanize',
     'django.contrib.sites',
     'django.contrib.sitemaps',
     'django_extensions',
+    'robots',
     'notes',
     'accounts',
 ]
@@ -36,6 +42,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = 'academic_note.urls'
@@ -112,3 +119,7 @@ STATICFILES_DIRS=[
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
