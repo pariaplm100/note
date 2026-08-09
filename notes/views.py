@@ -513,3 +513,13 @@ def edit_profile(request):
         return redirect("notes:view_profile")
 
     return render(request, "edit_profile.html", {"profile": profile})
+
+
+def news_item(request, pk):
+    pass
+
+def news_item2(request, pk):
+    pass
+
+def news_item3(request, pk):
+    pass

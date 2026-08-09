@@ -1,5 +1,6 @@
 from django.urls import path,include
 from django.contrib import admin
+from notes.feed import LatestEntriesFeed,LatestEntriesFeed2,LatestEntriesFeed3
 from notes import views
 
 app_name = "notes"
@@ -24,5 +25,10 @@ urlpatterns = [
     path("delete-file/<int:file_id>/", views.delete_file, name="delete_file"),
     path("note-files/<int:id>/", views.note_files, name="note_files"),
     path("home-notes-api/", views.home_notes_api, name="home_notes_api"),
-
+    path('rss/feed/', LatestEntriesFeed()),
+    path('rss/courses/', LatestEntriesFeed2()),
+    path('rss/files/', LatestEntriesFeed3()),
+    path("news/note/<int:pk>/", views.news_item, name="news-item"),
+    path("news/course/<int:pk>/", views.news_item2, name="news-item2"),
+    path("news/file/<int:pk>/", views.news_item3, name="news-item3"),
 ]
